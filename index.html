@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrowLabX</title>
+    <link rel="icon" type="image/webp" href="https://static.wikia.nocookie.net/zlodei/images/4/4e/Slenderm.webp/revision/latest?cb=20250908072129&path-prefix=ru">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #00ffff;
+            --secondary-color: #ff00ff;
+            --accent-color: #00ff88;
+            --dark-bg: #0a0a0f;
+            --darker-bg: #050508;
+            --card-bg: rgba(20, 20, 30, 0.8);
+            --text-color: #ffffff;
+            --text-secondary: #b0b0b0;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --neon-glow: 0 0 20px rgba(0, 255, 255, 0.5);
+            --neon-glow-strong: 0 0 40px rgba(0, 255, 255, 0.8);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-color);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(45deg, #0a0a0f 0%, #1a0a2e 50%, #0a0a0f 100%);
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--primary-color);
+            animation: float 15s infinite ease-in-out;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0) scale(1);
+            }
+            25% {
+                transform: translateY(-100px) translateX(50px) scale(1.2);
+            }
+            50% {
+                transform: translateY(-50px) translateX(-50px) scale(0.8);
+            }
+            75% {
+                transform: translateY(-150px) translateX(100px) scale(1.1);
+            }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: perspective(500px) rotateX(60deg) translateY(0);
+            }
+            100% {
+                transform: perspective(500px) rotateX(60deg) translateY(50px);
+            }
+        }
+
+        /* Onboarding Container */
+        #onboarding {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .welcome-screen {
+            text-align: center;
+            max-width: 800px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-3d {
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 80px rgba(0, 255, 255, 0.5);
+            animation: logoFloat 3s ease-in-out infinite;
+            margin-bottom: 30px;
+            letter-spacing: 5px;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% {
+                transform: translateY(0) rotateX(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotateX(10deg);
+            }
+        }
+
+        .typing-text {
+            font-size: 2rem;
+            margin-bottom: 40px;
+            min-height: 80px;
+            color: var(--primary-color);
+            text-shadow: var(--neon-glow);
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 3px;
+            height: 2rem;
+            background: var(--primary-color);
+            animation: blink 0.7s infinite;
+            margin-left: 5px;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* Question Slides */
+        .question-slide {
+            display: none;
+            max-width: 600px;
+            width: 100%;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 60px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 30px rgba(0, 255, 255, 0.1);
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            animation: slideIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-slide::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8) rotateY(-30deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotateY(0);
+            }
+        }
+
+        .question-slide.active {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            transition: width 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 0 20px var(--primary-color);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        .question-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #fff, var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGlow 2s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+            }
+            50% {
+                filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.8));
+            }
+        }
+
+        .input-group {
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            border-radius: 15px;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option-card {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 1.1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.2), transparent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            transform: translateY(-5px) scale(1.05);
+        }
+
+        .option-card:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .option-card.selected {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+            border-color: var(--primary-color);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        .btn {
+            padding: 18px 50px;
+            font-size: 1.2rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50px;
+            color: var(--dark-bg);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        /* Loading Animation */
+        .loading-screen {
+            display: none;
+            text-align: center;
+            padding: 60px;
+        }
+
+        .loading-screen.active {
+            display: block;
+        }
+
+        .loading-spinner {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 40px;
+            position: relative;
+            animation: spinnerRotate 2s linear infinite;
+        }
+
+        @keyframes spinnerRotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 5px solid transparent;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+
+        .spinner-ring:nth-child(2) {
+            border-top-color: var(--secondary-color);
+            animation-delay: 0.3s;
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+        }
+
+        .spinner-ring:nth-child(3) {
+            border-top-color: var(--accent-color);
+            animation-delay: 0.6s;
+            width: 60%;
+            height: 60%;
+            top: 20%;
+            left: 20%;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(720deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Homepage */
+        #homepage {
+            display: none;
+            min-height: 100vh;
+        }
+
+        #homepage.active {
+            display: block;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 5%;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            padding: 15px 5%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.6));
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 5% 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            max-width: 1000px;
+            z-index: 2;
+            animation: heroFadeIn 1.5s ease-out;
+        }
+
+        @keyframes heroFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-title {
+            font-size: 5rem;
+            font-weight: 900;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #fff, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: heroTitleFloat 4s ease-in-out infinite;
+            line-height: 1.2;
+        }
+
+        @keyframes heroTitleFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .hero-subtitle {
+            font-size: 1.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 50px;
+            animation: heroSubtitleFade 1.5s ease-out 0.3s both;
+        }
+
+        @keyframes heroSubtitleFade {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-top: 60px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            text-align: center;
+            animation: statFloat 3s ease-in-out infinite;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .stat-card:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes statFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-top: 10px;
+        }
+
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.1;
+            animation: shapeFloat 20s infinite ease-in-out;
+        }
+
+        .shape-1 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, var(--primary-color), transparent);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            top: 10%;
+            left: 10%;
+        }
+
+        .shape-2 {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, var(--secondary-color), transparent);
+            border-radius: 50%;
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .shape-3 {
+            width: 250px;
+            height: 250px;
+            background: linear-gradient(225deg, var(--accent-color), transparent);
+            border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%;
+            bottom: 10%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        @keyframes shapeFloat {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            33% {
+                transform: translate(50px, -50px) rotate(120deg);
+            }
+            66% {
+                transform: translate(-30px, 30px) rotate(240deg);
+            }
+        }
+
+        /* Sections */
+        .section {
+            padding: 100px 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .section-title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+        }
+
+        /* Feature Cards */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 40px;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            border-color: var(--primary-color);
+            box-shadow: 0 20px 60px rgba(0, 255, 255, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 4rem;
+            margin-bottom: 25px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-10px) rotate(5deg);
+            }
+        }
+
+        .feature-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        /* Method Cards */
+        .methods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .method-card {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.05), rgba(255, 0, 255, 0.05));
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 35px;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .method-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .method-card:hover::after {
+            left: 100%;
+        }
+
+        .method-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-color);
+            box-shadow: 0 15px 40px rgba(0, 255, 136, 0.3);
+        }
+
+        .method-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .method-title {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        .method-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Science Section */
+        .science-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .science-image {
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .science-image::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            animation: scienceShimmer 3s infinite;
+        }
+
+        @keyframes scienceShimmer {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        .science-text h3 {
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            color: var(--primary-color);
+        }
+
+        .science-text p {
+            font-size: 1.2rem;
+            line-height: 1.9;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .science-list {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .science-list li {
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .science-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* Reviews Section */
+        .reviews-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 35px;
+            margin-top: 60px;
+        }
+
+        .review-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 35px;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .review-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--secondary-color);
+            box-shadow: 0 15px 40px rgba(255, 0, 255, 0.3);
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .review-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-right: 20px;
+            color: var(--dark-bg);
+        }
+
+        .review-info h4 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .review-stars {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+
+        .review-text {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        .review-growth {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .review-growth strong {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 120px 5%;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.1), transparent);
+            animation: ctaPulse 8s infinite;
+        }
+
+        @keyframes ctaPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-title {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-text {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 50px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn-large {
+            padding: 25px 60px;
+            font-size: 1.4rem;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: var(--dark-bg);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 60px 5%;
+            background: var(--darker-bg);
+            border-top: 2px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 50px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: var(--text-secondary);
+            line-height: 2;
+            text-decoration: none;
+            display: block;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .social-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--dark-bg);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .social-icon:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.5);
+        }
+
+        .copyright {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 255, 255, 0.1);
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .logo-3d {
+                font-size: 3rem;
+            }
+
+            .typing-text {
+                font-size: 1.5rem;
+            }
+
+            .hero-title {
+                font-size: 3rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.3rem;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+
+            .nav-menu {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .science-content {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid,
+            .methods-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Scroll Animations */
+        .scroll-fade {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .scroll-fade.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Additional Utility Classes */
+        .text-gradient {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .glow-text {
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        /* Additional 3D Effects */
+        .card-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+
+        .card-3d:hover {
+            transform: rotateY(10deg) rotateX(10deg);
+        }
+
+        /* Holographic Effect */
+        .holographic {
+            background: linear-gradient(135deg, 
+                rgba(0, 255, 255, 0.1) 0%,
+                rgba(255, 0, 255, 0.1) 25%,
+                rgba(0, 255, 136, 0.1) 50%,
+                rgba(255, 0, 255, 0.1) 75%,
+                rgba(0, 255, 255, 0.1) 100%);
+            background-size: 200% 200%;
+            animation: holographicShift 5s ease infinite;
+        }
+
+        @keyframes holographicShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        /* Glitch Effect */
+        .glitch {
+            position: relative;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0.8;
+        }
+
+        .glitch::before {
+            animation: glitch-1 0.3s infinite;
+            color: var(--primary-color);
+            z-index: -1;
+        }
+
+        .glitch::after {
+            animation: glitch-2 0.3s infinite;
+            color: var(--secondary-color);
+            z-index: -2;
+        }
+
+        @keyframes glitch-1 {
+            0%, 100% {
+                transform: translate(0);
+            }
+            20% {
+                transform: translate(-2px, 2px);
+            }
+            40% {
+                transform: translate(-2px, -2px);
+            }
+            60% {
+                transform: translate(2px, 2px);
+            }
+            80% {
+                transform: translate(2px, -2px);
+            }
+        }
+
+        @keyframes glitch-2 {
+            0%, 100% {
+                transform: translate(0);
+            }
+            20% {
+                transform: translate(2px, -2px);
+            }
+            40% {
+                transform: translate(2px, 2px);
+            }
+            60% {
+                transform: translate(-2px, -2px);
+            }
+            80% {
+                transform: translate(-2px, 2px);
+            }
+        }
+
+        /* Neon Border Animation */
+        .neon-border {
+            position: relative;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            overflow: hidden;
+        }
+
+        .neon-border::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                transparent,
+                var(--primary-color),
+                transparent 30%
+            );
+            animation: neonRotate 4s linear infinite;
+        }
+
+        @keyframes neonRotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .neon-border::after {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            background: var(--card-bg);
+            border-radius: inherit;
+        }
+
+        /* Particle Effect for Cards */
+        .particle-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .particle-effect::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle, var(--primary-color) 1px, transparent 1px),
+                radial-gradient(circle, var(--secondary-color) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            opacity: 0.1;
+            animation: particleMove 20s linear infinite;
+        }
+
+        @keyframes particleMove {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(50px);
+            }
+        }
+
+        /* Wave Animation */
+        .wave-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wave {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 200%;
+            height: 100px;
+            background: linear-gradient(90deg, 
+                transparent,
+                rgba(0, 255, 255, 0.1),
+                transparent);
+            animation: wave 8s linear infinite;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: translateX(-50%) translateY(0);
+            }
+            100% {
+                transform: translateX(0) translateY(0);
+            }
+        }
+
+        /* Magnetic Button Effect */
+        .btn-magnetic {
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .btn-magnetic:hover {
+            animation: magnetic 0.5s ease-in-out infinite;
+        }
+
+        @keyframes magnetic {
+            0%, 100% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(-3px, -3px);
+            }
+            75% {
+                transform: translate(3px, 3px);
+            }
+        }
+        .locked-container {
+    position: relative;
+    cursor: pointer;
+     width: 100%;
+    height: 100%;
+    position: relative;
+    background-color: #0a0a0f;
+}
+
+.blurred-content {
+    filter: blur(8px);
+    pointer-events: none; /* prevents interaction */
+    user-select: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: #0a0a0f;
+}
+
+.locked-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    
+    background: rgba(0, 0, 0, 0.6);
+    padding: 15px 25px;
+    border-radius: 12px;
+
+    z-index: 10;
+    backdrop-filter: blur(10px);
+}
+.card-link {
+    text-decoration: none;   /* removes underline */
+    color: inherit;          /* keeps your original text color */
+    display: block;          /* makes full card clickable */
+}
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="grid-overlay"></div>
+    </div>
+
+    <!-- Onboarding Section -->
+    <div id="onboarding">
+        <!-- Welcome Screen -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <h1 class="logo-3d">GrowLabX</h1>
+            <div class="typing-text" id="typingText"></div>
+            <button class="btn" onclick="startOnboarding()">Begin Your Growth Journey</button>
+        </div>
+
+        <!-- Question 1: Age -->
+        <div class="question-slide" id="slide1">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 11%"></div>
+            </div>
+            <h2 class="question-title">What's your current age?</h2>
+            <div class="input-group">
+                <input type="number" id="currentAge" placeholder="Enter your age" min="1" max="100">
+            </div>
+            <button class="btn" onclick="nextSlide(2)">Continue</button>
+        </div>
+
+        <!-- Question 2: Current Height -->
+        <div class="question-slide" id="slide2">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 22%"></div>
+            </div>
+            <h2 class="question-title">What's your current height?</h2>
+            <div class="input-group">
+                <input type="number" id="currentHeight" placeholder="Height in cm" min="50" max="250">
+            </div>
+            <button class="btn" onclick="nextSlide(3)">Continue</button>
+        </div>
+
+        <!-- Question 3: Body Hair -->
+        <div class="question-slide" id="slide3">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 33%"></div>
+            </div>
+            <h2 class="question-title">Body Hair Development</h2>
+            <div class="option-grid">
+                <div class="option-card" onclick="selectOption(this, 'bodyHair', 'none')">
+                    <div>No Hair</div>
+                </div>
+                <div class="option-card" onclick="selectOption(this, 'bodyHair', 'minimal')">
+                    <div>Minimal</div>
+                </div>
+                <div class="option-card" onclick="selectOption(this, 'bodyHair', 'moderate')">
+                    <div>Moderate</div>
+                </div>
+                <div class="option-card" onclick="selectOption(this, 'bodyHair', 'significant')">
+                    <div>Significant</div>
+                </div>
+                <div class="option-card" onclick="selectOption(this, 'bodyHair', 'full')">
+                    <div>Full Development</div>
+                </div>
+            </div>
+            <button class="btn" onclick="nextSlide(4)">Continue</button>
+        </div>
+
+        <!-- Question 4: Puberty Start Age -->
+        <div class="question-slide" id="slide4">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 44%"></div>
+            </div>
+            <h2 class="question-title">When did you start puberty?</h2>
+            <div class="input-group">
+                <input type="number" id="pubertyAge" placeholder="Age when puberty started" min="8" max="20">
+            </div>
+            <button class="btn" onclick="nextSlide(5)">Continue</button>
+        </div>
+
+        <!-- Question 5: Diet -->
+        <div class="question-slide" id="slide5">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 55%"></div>
+            </div>
+            <h2 class="question-title">What's your diet preference?</h2>
+            <div class="option-grid">
+                <div class="option-card" onclick="selectOption(this, 'diet', 'vegan')">
+                    <div>🥬 Vegan</div>
+                </div>
+                <div class="option-card" onclick="selectOption(this, 'diet', 'vegetarian')">
+                    <div>🥗 Vegetarian</div>
+                </div>
+                <div class="option-card" onclick="selectOption(this, 'diet', 'nonveg')">
+                    <div>🍖 Non-Veg</div>
+                </div>
+            </div>
+            <button class="btn" onclick="nextSlide(6)">Continue</button>
+        </div>
+
+        <!-- Question 6: Parents Height -->
+        <div class="question-slide" id="slide6">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 66%"></div>
+            </div>
+            <h2 class="question-title">Parent's Heights</h2>
+            <div class="input-group">
+                <input type="number" id="fatherHeight" placeholder="Father's height (cm)" min="100" max="250">
+            </div>
+            <div class="input-group">
+                <input type="number" id="motherHeight" placeholder="Mother's height (cm)" min="100" max="250">
+            </div>
+            <button class="btn" onclick="nextSlide(7)">Continue</button>
+        </div>
+
+        <!-- Question 7: Extended Family Height -->
+        <div class="question-slide" id="slide7">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 77%"></div>
+            </div>
+            <h2 class="question-title">Extended Family Heights</h2>
+            <div class="input-group">
+                <input type="number" id="grandfatherHeight" placeholder="Grandfather's height (cm)" min="100" max="250">
+            </div>
+            <div class="input-group">
+                <input type="number" id="uncleHeight" placeholder="Uncle's height (cm)" min="100" max="250">
+            </div>
+            <button class="btn" onclick="nextSlide(8)">Continue</button>
+        </div>
+
+        <!-- Question 8: Body Type -->
+        <div class="question-slide" id="slide8">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 88%"></div>
+            </div>
+            <h2 class="question-title">What's your body type?</h2>
+            <div class="option-grid">
+                <div class="option-card" onclick="selectOption(this, 'bodyType', 'lanky')">
+                    <div>Lanky</div>
+                </div>
+                <div class="option-card" onclick="selectOption(this, 'bodyType', 'skinny')">
+                    <div>Skinny</div>
+                </div>
+                <div class="option-card" onclick="selectOption(this, 'bodyType', 'normal')">
+                    <div>Normal</div>
+                </div>
+                <div class="option-card" onclick="selectOption(this, 'bodyType', 'muscular')">
+                    <div>Muscular</div>
+                </div>
+                <div class="option-card" onclick="selectOption(this, 'bodyType', 'overweight')">
+                    <div>Overweight</div>
+                </div>
+            </div>
+            <button class="btn" onclick="nextSlide(9)">Continue</button>
+        </div>
+
+        <!-- Question 9: Sleep -->
+        <div class="question-slide" id="slide9">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 100%"></div>
+            </div>
+            <h2 class="question-title">How many hours do you sleep?</h2>
+            <div class="option-grid">
+                <div class="option-card" onclick="selectOption(this, 'sleep', '4-5')">
+                    <div>4-5 hours</div>
+                </div>
+                <div class="option-card" onclick="selectOption(this, 'sleep', '6-7')">
+                    <div>6-7 hours</div>
+                </div>
+                <div class="option-card" onclick="selectOption(this, 'sleep', '8-9')">
+                    <div>8-9 hours</div>
+                </div>
+                <div class="option-card" onclick="selectOption(this, 'sleep', '10+')">
+                    <div>10+ hours</div>
+                </div>
+            </div>
+            <button class="btn" onclick="generatePlan()">Generate My Plan</button>
+        </div>
+
+        <!-- Loading Screen -->
+        <div class="loading-screen" id="loadingScreen">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+            </div>
+            <div class="loading-text" id="loadingText">Analyzing your data...</div>
+        </div>
+    </div>
+
+    <!-- Homepage -->
+    <div id="homepage">
+        <!-- Header -->
+        <header class="header" id="header">
+            <nav class="nav-container">
+                <div class="nav-logo">GrowLabX</div>
+                <ul class="nav-menu">
+                    <li><a href="#home" class="nav-link">Home</a></li>
+                    <li><a href="#features" class="nav-link">Features</a></li>
+                    <li><a href="#methods" class="nav-link">Methods</a></li>
+                    <li><a href="#science" class="nav-link">Science</a></li>
+                    <li><a href="#reviews" class="nav-link">Reviews</a></li>
+                    <button onclick="k9()">Log out</button>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero-section" id="home">
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+            </div>
+            <div class="hero-content">
+                <h1 class="hero-title">Welcome to Your Growth Journey</h1>
+                <p class="hero-subtitle">Science-backed methods to maximize your height potential</p>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">15K+</div>
+                        <div class="stat-label">Active Members</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">2.5"</div>
+                        <div class="stat-label">Avg. Growth</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">98%</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="section scroll-fade" id="features">
+            <div class="section-header">
+                <h2 class="section-title">Predict Your Future Height</h2>
+                <p class="section-subtitle">Advanced algorithms based on genetics and growth patterns</p>
+            </div>
+            <div class="features-grid">
+                <a href="predictor.html" class="feature-card card-3d">
+    <div class="feature-icon">📊</div>
+    <h3 class="feature-title">Predict Your Future Height</h3>
+    <p class="feature-description">
+        Our advanced analyzes your genetic data, family history, and current growth patterns to provide accurate height predictions.
+    </p>
+</a>
+              <a href="genetics.html" class="card-link">
+    <div class="feature-card card-3d">
+        <div class="feature-icon">🧬</div>
+        <h3 class="feature-title">Genetic Mapping</h3>
+        <p class="feature-description">
+            Comprehensive analysis of your family's height genetics to determine your maximum growth potential.
+        </p>
+    </div>
+</a>
+  <a href="workout.html" class="card-link">
+                <div class="feature-card card-3d">
+                    <div class="feature-icon">📈</div>
+                    <h3 class="feature-title">30 days +3cm 100% working workout plan</h3>
+                    <p class="feature-description">30 days workout plan made by our experts to help you grow 3cm in a month</p>
+                </div>
+            </div>
+        </a>
+        </section>
+
+      <div class="locked-container" onclick="unlockPlan()">
+    
+    <div class="locked-overlay">
+        🔒 Unlock Your Plan
+    </div>
+        <section class="section scroll-fade holographic">
+            <div class="section-header">
+                <h2 class="section-title">Your Customized Growth Plan</h2>
+                <p class="section-subtitle">Personalized strategies tailored to your unique profile</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card neon-border">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Personalized Nutrition</h3>
+                    <p class="feature-description">Custom meal plans rich in growth-promoting nutrients, vitamins, and minerals optimized for your body type and dietary preferences.</p>
+                </div>
+                <div class="feature-card neon-border">
+                    <div class="feature-icon">💪</div>
+                    <h3 class="feature-title">Exercise Routines</h3>
+                    <p class="feature-description">Specialized stretching and resistance exercises designed to stimulate growth hormone production and improve posture.</p>
+                </div>
+                <div class="feature-card neon-border">
+                    <div class="feature-icon">😴</div>
+                    <h3 class="feature-title">Sleep Optimization</h3>
+                    <p class="feature-description">Science-backed sleep schedules to maximize growth hormone secretion during deep sleep phases.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+        <!-- Methods Section -->
+        <section class="section scroll-fade" id="methods">
+            <div class="section-header">
+                <h2 class="section-title">Height Growth Methods</h2>
+                <p class="section-subtitle">Ultimate Height Growth Methods</p>
+            </div>
+            <div class="methods-grid">
+                <div class="method-card particle-effect">
+                    <div class="method-number">01</div>
+                    <h3 class="method-title">Nutrition</h3>
+                    <p class="method-description">Nutrition During Puberty is the best thing you can do , we did hours of research to make the best diet for you to increase hgh and igf1</p>
+                </div>
+                <div class="method-card particle-effect">
+                    <div class="method-number">02</div>
+                    <h3 class="method-title">Exercises</h3>
+                    <p class="method-description">Secret Exercises Which Boosts HGH And IGF1 and corrects posture</p>
+                </div>
+                <div class="method-card particle-effect">
+                    <div class="method-number">03</div>
+                    <h3 class="method-title">Posture Correction</h3>
+                    <p class="method-description">30 Day Plan to get perfect posture and gain upto 3 inches of height</p>
+                </div>
+                <div class="method-card particle-effect">
+                    <div class="method-number">04</div>
+                    <h3 class="method-title">Hardmaxxing</h3>
+                    <p class="method-description">Surgries for height and full plans.</p>
+                </div>
+                <div class="method-card particle-effect">
+                    <div class="method-number">05</div>
+                    <h3 class="method-title">Stress Management</h3>
+                    <p class="method-description">Cortisol reduction techniques as high stress levels can inhibit growth hormone production.</p>
+                </div>
+                <div class="method-card particle-effect">
+                    <div class="method-number">06</div>
+                    <h3 class="method-title">Peptidemaxxing</h3>
+                    <p class="method-description">Hours of research for best peptides for height growth</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Peptides Science Section -->
+        <section class="section scroll-fade wave-container" id="science">
+            <div class="wave"></div>
+            <div class="section-header">
+                <h2 class="section-title">Peptides Science</h2>
+                <p class="section-subtitle">Understanding the science behind growth enhancement</p>
+            </div>
+            <div class="science-content">
+                <div class="science-image">
+                    🧪
+                </div>
+                <a href="hgh.html" class="card-link">
+                <div class="science-text">
+                    <h3>Growth Hormone Peptides</h3>
+                    <p>Growth hormone-releasing peptides (GHRPs) are synthetic compounds that stimulate the pituitary gland to produce more growth hormone naturally.</p>
+                    <p>These peptides work by mimicking ghrelin, a hormone that signals the body to release growth hormone, particularly during sleep and exercise.</p>
+                    <ul class="science-list">
+                        <li>Increases natural HGH production by up to 300%</li>
+                        <li>Promotes bone density and length during growth phases</li>
+                        <li>Enhances protein synthesis for muscle development</li>
+                        <li>Improves sleep quality for better recovery</li>
+                        <li>Supports collagen production for joint health</li>
+                    </ul>
+                </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Hormones Section -->
+        <section class="section scroll-fade">
+            <div class="section-header">
+                <h2 class="section-title">Hormones & Growth</h2>
+                <p class="section-subtitle">The biological mechanisms behind height development</p>
+            </div>
+            <div class="science-content">
+                <a href="hgh.html" class="card-link">
+                <div class="science-text">
+                    <h3>Key Growth Hormones</h3>
+                    <p>Multiple hormones work synergistically to regulate growth and development throughout childhood and adolescence.</p>
+                    <ul class="science-list">
+                        <li><strong>Growth Hormone (GH):</strong> Primary hormone for linear growth, secreted by pituitary gland</li>
+                        <li><strong>IGF-1:</strong> Insulin-like growth factor stimulated by GH, promotes bone and tissue growth</li>
+                        <li><strong>Thyroid Hormones:</strong> Regulate metabolism and are essential for normal growth</li>
+                        <li><strong>Sex Hormones:</strong> Testosterone and estrogen contribute to growth spurts during puberty</li>
+                        <li><strong>Cortisol:</strong> Stress hormone that can inhibit growth when chronically elevated</li>
+                    </ul>
+                </div>
+                </a>
+                <div class="science-image">
+                    ⚗️
+                </div>
+            </div>
+        </section>
+
+        <!-- Additional Methods Section -->
+        <section class="section scroll-fade holographic">
+            <div class="section-header">
+                <h2 class="section-title">Advanced Growth Techniques(Coming Soon)</h2>
+                <p class="section-subtitle">Cutting-edge methods for maximum results</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🧘</div>
+                    <h3 class="feature-title">Yoga & Pilates</h3>
+                    <p class="feature-description">Specific poses that decompress the spine, improve flexibility, and promote better posture for height optimization.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏊</div>
+                    <h3 class="feature-title">Swimming Protocol</h3>
+                    <p class="feature-description">Low-impact full-body exercise that stretches the entire body while building lean muscle mass.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🥛</div>
+                    <h3 class="feature-title">Micronutrient Therapy</h3>
+                    <p class="feature-description">Targeted supplementation of vitamins A, C, D, K, calcium, magnesium, and phosphorus for bone health.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⏰</div>
+                    <h3 class="feature-title">Circadian Optimization</h3>
+                    <p class="feature-description">Aligning sleep-wake cycles with natural HGH secretion patterns for maximum growth potential.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🧬</div>
+                    <h3 class="feature-title">Epigenetic Factors</h3>
+                    <p class="feature-description">Lifestyle modifications that influence gene expression related to growth and development.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3 class="feature-title">Smart Monitoring</h3>
+                    <p class="feature-description">AI-powered tracking systems that provide real-time feedback and adjustments to your growth plan.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reviews Section -->
+        <section class="section scroll-fade" id="reviews">
+            <div class="section-header">
+                <h2 class="section-title">Success Stories</h2>
+                <p class="section-subtitle">Real results from our community</p>
+            </div>
+            <div class="reviews-container">
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">MD</div>
+                        <div class="review-info">
+                            <h4>Michael Donaldson</h4>
+                            <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                        </div>
+                    </div>
+                    <p class="review-text">"Dude trust me this shit changed my life forever i was manlet getting heightmogge left and right but now i grew 3 inches and frauds with insoles I am 6 feet 1 walking now"</p>
+                    <div class="review-growth">
+                        <strong>Growth: +3 inches in 8 months</strong>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">JP</div>
+                        <div class="review-info">
+                            <h4>James Trump</h4>
+                            <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                        </div>
+                    </div>
+                    <p class="review-text">"From average joe to heightmogger"</p>
+                    <div class="review-growth">
+                        <strong>Growth: +2.5 inches in 6 months</strong>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">RG</div>
+                        <div class="review-info">
+                            <h4>Rahul Gupta</h4>
+                            <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                        </div>
+                    </div>
+                    <p class="review-text">"At 15, I was shorter than all my friends. GrowLabX's AI analysis predicted I could reach 5'11" and gave me a roadmap. Six months in, I've already grown 2 inches and feel amazing!"</p>
+                    <div class="review-growth">
+                        <strong>Growth: +3 inches in 6 months</strong>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">T</div>
+                        <div class="review-info">
+                            <h4>Tyrone</h4>
+                            <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                        </div>
+                    </div>
+                    <p class="review-text">"Man this shit is fire before i was your average black guy but now I am tall I can finally bbcmaxx and slay some snowbunnies"</p>
+                    <div class="review-growth">
+                        <strong>Growth: +1.8 inches in 5 months</strong>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">VA</div>
+                        <div class="review-info">
+                            <h4>Vikram Aaditya</h4>
+                            <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                        </div>
+                    </div>
+                    <p class="review-text">"I was 5 6 manlet before coping about muah height don't matter but when my crush rejected me I came straight to growlabs"</p>
+                    <div class="review-growth">
+                        <strong>Growth: +2.7 inches in 7 months</strong>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">CC</div>
+                        <div class="review-info">
+                            <h4>Ching Chong</h4>
+                            <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                        </div>
+                    </div>
+                    <p class="review-text">"啊，我现在个子高了，可以拉更多弯腰了。"</p>
+                    <div class="review-growth">
+                        <strong>Growth: +2.2 inches in 6 months</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to Unlock Your Growth Potential?</h2>
+                <p class="cta-text">Join thousands of people who are achieving their height goals</p>
+                <div class="cta-buttons">
+                    <button class="btn btn-large" onclick="resetOnboarding()">Log Out</button>
+                  
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>GrowLabX</h3>
+                    <p>Empowering individuals to reach their maximum height potential through science-backed methods and personalized guidance.</p>
+                    <div class="social-links">
+                        <div class="social-icon">f</div>
+                        <div class="social-icon">t</div>
+                        <div class="social-icon">i</div>
+                        <div class="social-icon">y</div>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <a href="#home">Home</a>
+                    <a href="#features">Features</a>
+                    <a href="#methods">Methods</a>
+                    <a href="#science">Science</a>
+                    <a href="#reviews">Reviews</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <a href="#">Growth Guide</a>
+                    <a href="#">Nutrition Plans</a>
+                    <a href="#">Exercise Library</a>
+                    <a href="#">Scientific Studies</a>
+                    <a href="#">FAQ</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>Email: gmkaushik69@gmail.com</p>
+                    <p>Discord:growlabx</p>
+                    <p>Address: 123 Growth Street, Height City, HC 12345</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2024 GrowLabX. All rights reserved. | Privacy Policy | Terms of Service</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Global variables
+        let userData = {};
+        let currentSlide = 0;
+
+        // Create particles for background
+        function createParticles() {
+            const bg = document.querySelector('.animated-bg');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = Math.random() * 5 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = Math.random() * 10 + 10 + 's';
+                bg.appendChild(particle);
+            }
+        }
+
+        // Typing effect
+        function typeText(element, text, speed = 50) {
+            let i = 0;
+            element.innerHTML = '';
+            const cursor = document.createElement('span');
+            cursor.className = 'cursor';
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML = text.substring(0, i + 1);
+                    element.appendChild(cursor);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // Initialize welcome screen
+        window.onload = function() {
+            createParticles();
+            const messages = [
+                "Welcome to the future of height growth...",
+                "Where science meets transformation...",
+                "Your journey to new heights begins here..."
+            ];
+            let messageIndex = 0;
+            
+            function showNextMessage() {
+                const typingText = document.getElementById('typingText');
+                typeText(typingText, messages[messageIndex]);
+                messageIndex = (messageIndex + 1) % messages.length;
+            }
+            
+            showNextMessage();
+            setInterval(showNextMessage, 5000);
+
+            // Check if user has completed onboarding
+            const completed = localStorage.getItem('onboardingCompleted');
+            if (completed === 'true') {
+                showHomepage();
+            }
+        };
+
+        // Start onboarding
+        function startOnboarding() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('slide1').classList.add('active');
+        }
+function k9() {
+localStorage.clear()
+}
+        // Next slide
+        function nextSlide(slideNumber) {
+            // Validate current slide
+            if (!validateSlide(currentSlide + 1)) {
+                return;
+            }
+
+            // Hide current slide
+            const currentSlideEl = document.getElementById('slide' + (currentSlide + 1));
+            if (currentSlideEl) {
+                currentSlideEl.classList.remove('active');
+            }
+
+            // Show next slide
+            currentSlide = slideNumber - 1;
+            const nextSlideEl = document.getElementById('slide' + slideNumber);
+            if (nextSlideEl) {
+                nextSlideEl.classList.add('active');
+            }
+        }
+
+        // Validate slide data
+        function validateSlide(slideNumber) {
+            switch(slideNumber) {
+                case 1:
+                    const age = document.getElementById('currentAge').value;
+                    if (!age || age < 1 || age > 100) {
+                        alert('Please enter a valid age');
+                        return false;
+                    }
+                    userData.currentAge = age;
+                    break;
+                case 2:
+                    const height = document.getElementById('currentHeight').value;
+                    if (!height || height < 50 || height > 250) {
+                        alert('Please enter a valid height');
+                        return false;
+                    }
+                    userData.currentHeight = height;
+                    break;
+                case 3:
+                    if (!userData.bodyHair) {
+                        alert('Please select your body hair development');
+                        return false;
+                    }
+                    break;
+                case 4:
+                    const pubertyAge = document.getElementById('pubertyAge').value;
+                    if (!pubertyAge || pubertyAge < 8 || pubertyAge > 20) {
+                        alert('Please enter a valid puberty age');
+                        return false;
+                    }
+                    userData.pubertyAge = pubertyAge;
+                    break;
+                case 5:
+                    if (!userData.diet) {
+                        alert('Please select your diet preference');
+                        return false;
+                    }
+                    break;
+                case 6:
+                    const fatherHeight = document.getElementById('fatherHeight').value;
+                    const motherHeight = document.getElementById('motherHeight').value;
+                    if (!fatherHeight || !motherHeight) {
+                        alert('Please enter both parent heights');
+                        return false;
+                    }
+                    userData.fatherHeight = fatherHeight;
+                    userData.motherHeight = motherHeight;
+                    break;
+                case 7:
+                    const grandfatherHeight = document.getElementById('grandfatherHeight').value;
+                    const uncleHeight = document.getElementById('uncleHeight').value;
+                    if (!grandfatherHeight || !uncleHeight) {
+                        alert('Please enter extended family heights');
+                        return false;
+                    }
+                    userData.grandfatherHeight = grandfatherHeight;
+                    userData.uncleHeight = uncleHeight;
+                    break;
+                case 8:
+                    if (!userData.bodyType) {
+                        alert('Please select your body type');
+                        return false;
+                    }
+                    break;
+                case 9:
+                    if (!userData.sleep) {
+                        alert('Please select your sleep duration');
+                        return false;
+                    }
+                    break;
+            }
+            return true;
+        }
+
+        // Select option
+        function selectOption(element, field, value) {
+            // Remove selected class from siblings
+            const siblings = element.parentElement.children;
+            for (let sibling of siblings) {
+                sibling.classList.remove('selected');
+            }
+            
+            // Add selected class to clicked element
+            element.classList.add('selected');
+            
+            // Save data
+            userData[field] = value;
+        }
+
+        // Generate plan
+        function generatePlan() {
+            if (!validateSlide(9)) {
+                return;
+            }
+
+            // Save all data to localStorage
+            localStorage.setItem('userData', JSON.stringify(userData));
+            localStorage.setItem('onboardingCompleted', 'true');
+
+            // Hide last slide
+            document.getElementById('slide9').classList.remove('active');
+            
+            // Show loading screen
+            const loadingScreen = document.getElementById('loadingScreen');
+            loadingScreen.classList.add('active');
+
+            // Loading messages
+            const loadingMessages = [
+                'Analyzing your genetic data...',
+                'Calculating growth potential...',
+                'Optimizing nutrition plan...',
+                'Customizing exercise routine...',
+                'Generating your personalized plan...',
+                'Almost ready...'
+            ];
+
+            let messageIndex = 0;
+            const loadingText = document.getElementById('loadingText');
+            
+            const messageInterval = setInterval(() => {
+                loadingText.textContent = loadingMessages[messageIndex];
+                messageIndex++;
+                if (messageIndex >= loadingMessages.length) {
+                    clearInterval(messageInterval);
+                }
+            }, 800);
+
+            // Show homepage after loading
+            setTimeout(() => {
+                showHomepage();
+                document.getElementById("homepage").style.display = "none";
+            }, 5000);
+        }
+
+        // Show homepage
+        function showHomepage() {
+            document.getElementById('onboarding').style.display = 'none';
+            document.getElementById('homepage').classList.add('active');
+            
+            // Initialize scroll animations
+            initScrollAnimations();
+        }
+
+        // Reset onboarding
+        function resetOnboarding() {
+            localStorage.removeItem('onboardingCompleted');
+            localStorage.removeItem('userData');
+            location.reload();
+        }
+
+        // Scroll animations
+        function initScrollAnimations() {
+            const scrollElements = document.querySelectorAll('.scroll-fade');
+            
+            const elementInView = (el, offset = 100) => {
+                const elementTop = el.getBoundingClientRect().top;
+                return elementTop <= (window.innerHeight || document.documentElement.clientHeight) - offset;
+            };
+            
+            const displayScrollElement = (element) => {
+                element.classList.add('visible');
+            };
+            
+            const handleScrollAnimation = () => {
+                scrollElements.forEach((el) => {
+                    if (elementInView(el, 100)) {
+                        displayScrollElement(el);
+                    }
+                });
+            };
+            
+            window.addEventListener('scroll', handleScrollAnimation);
+            handleScrollAnimation(); // Initial check
+        }
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add 3D tilt effect to cards
+        document.querySelectorAll('.card-3d').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+            });
+        });
+
+        // Console welcome message
+        console.log('%c Welcome to GrowLabX! ', 'background: linear-gradient(45deg, #00ffff, #ff00ff); color: #000; font-size: 20px; font-weight: bold; padding: 10px;');
+        console.log('%c Your data is securely stored locally. ', 'color: #00ffff; font-size: 14px;');
+    </script>
+</body>
+</html>

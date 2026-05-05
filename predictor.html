@@ -1,0 +1,2731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Height Calculator</title>
+    <link rel="icon" type="image/webp" href="https://static.wikia.nocookie.net/zlodei/images/4/4e/Slenderm.webp/revision/latest?cb=20250908072129&path-prefix=ru">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #00ffff;
+            --secondary-color: #ff00ff;
+            --accent-color: #00ff88;
+            --dark-bg: #0a0a0f;
+            --darker-bg: #050508;
+            --card-bg: rgba(20, 20, 30, 0.8);
+            --text-color: #ffffff;
+            --text-secondary: #b0b0b0;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --neon-glow: 0 0 20px rgba(0, 255, 255, 0.5);
+            --neon-glow-strong: 0 0 40px rgba(0, 255, 255, 0.8);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-color);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(45deg, #0a0a0f 0%, #1a0a2e 50%, #0a0a0f 100%);
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--primary-color);
+            animation: float 15s infinite ease-in-out;
+            opacity: 0.3;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0) scale(1);
+            }
+            25% {
+                transform: translateY(-100px) translateX(50px) scale(1.2);
+            }
+            50% {
+                transform: translateY(-50px) translateX(-50px) scale(0.8);
+            }
+            75% {
+                transform: translateY(-150px) translateX(100px) scale(1.1);
+            }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: perspective(500px) rotateX(60deg) translateY(0);
+            }
+            100% {
+                transform: perspective(500px) rotateX(60deg) translateY(50px);
+            }
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 5%;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-logo:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.6));
+        }
+
+        .back-btn {
+            padding: 12px 30px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50px;
+            color: var(--dark-bg);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.5);
+        }
+
+        /* Loading Screen */
+        .loading-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .loading-container.hidden {
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 60px;
+            position: relative;
+            animation: spinnerRotate 2s linear infinite;
+        }
+
+        @keyframes spinnerRotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 6px solid transparent;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+
+        .spinner-ring:nth-child(2) {
+            border-top-color: var(--secondary-color);
+            animation-delay: 0.3s;
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+        }
+
+        .spinner-ring:nth-child(3) {
+            border-top-color: var(--accent-color);
+            animation-delay: 0.6s;
+            width: 60%;
+            height: 60%;
+            top: 20%;
+            left: 20%;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(720deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 2rem;
+            color: var(--primary-color);
+            animation: pulse 1.5s ease-in-out infinite;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .loading-subtext {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            text-align: center;
+            max-width: 600px;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Results Container */
+        .results-container {
+            display: none;
+            padding: 120px 5% 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .results-container.active {
+            display: block;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Hero Result Section */
+        .result-hero {
+            text-align: center;
+            margin-bottom: 80px;
+            position: relative;
+        }
+
+        .result-title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 10px rgba(0, 255, 255, 0.5));
+            }
+            50% {
+                filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.8));
+            }
+        }
+
+        .result-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 60px;
+        }
+
+        /* Height Display */
+        .height-display {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 80px 60px;
+            border: 3px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset 0 0 50px rgba(0, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 60px;
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+        }
+
+        .height-display:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            box-shadow: 0 40px 100px rgba(0, 255, 255, 0.3);
+        }
+
+        .height-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        .current-height {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .predicted-height {
+            font-size: 6rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: heightPulse 2s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes heightPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .height-range {
+            font-size: 1.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .growth-potential {
+            display: inline-block;
+            padding: 20px 40px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 255, 0.2));
+            border-radius: 50px;
+            border: 2px solid var(--accent-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+            }
+            50% {
+                box-shadow: 0 10px 50px rgba(0, 255, 136, 0.6);
+            }
+        }
+
+        /* Scenario Card */
+        .scenario-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 50px;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            margin-bottom: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scenario-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .scenario-card:hover::after {
+            left: 100%;
+        }
+
+        .scenario-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .scenario-icon {
+            font-size: 3rem;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-10px) rotate(5deg);
+            }
+        }
+
+        .scenario-description {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .scenario-tag {
+            display: inline-block;
+            padding: 10px 25px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+            border-radius: 50px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            font-size: 1.1rem;
+            margin-right: 15px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        /* Analysis Grid */
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .analysis-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 40px;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analysis-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .analysis-card:hover::before {
+            opacity: 1;
+        }
+
+        .analysis-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            border-color: var(--primary-color);
+            box-shadow: 0 20px 60px rgba(0, 255, 255, 0.3);
+        }
+
+        .analysis-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .analysis-title {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .analysis-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+
+        .analysis-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-top: 15px;
+        }
+
+        /* Progress Bars */
+        .factor-list {
+            list-style: none;
+        }
+
+        .factor-item {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .factor-item:last-child {
+            border-bottom: none;
+        }
+
+        .factor-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .factor-name {
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+
+        .factor-score {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .factor-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .factor-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 10px;
+            transition: width 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 0 20px var(--primary-color);
+            position: relative;
+        }
+
+        .factor-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* Recommendations Section */
+        .recommendations-section {
+            margin-top: 60px;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 50px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .recommendation-card {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.05), rgba(255, 0, 255, 0.05));
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 35px;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recommendation-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .recommendation-card:hover::after {
+            left: 100%;
+        }
+
+        .recommendation-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-color);
+            box-shadow: 0 15px 40px rgba(0, 255, 136, 0.3);
+        }
+
+        .recommendation-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        .recommendation-title {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        .recommendation-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Timeline Section */
+        .timeline-section {
+            margin-top: 80px;
+            padding: 60px 0;
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            box-shadow: 0 0 20px var(--primary-color);
+        }
+
+        .timeline-item {
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: 0;
+            margin-right: 50%;
+            padding-right: 50px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 50%;
+            padding-left: 50px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            border: 5px solid var(--dark-bg);
+            box-shadow: 0 0 30px var(--primary-color);
+            z-index: 10;
+            animation: dotPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes dotPulse {
+            0%, 100% {
+                box-shadow: 0 0 30px var(--primary-color);
+            }
+            50% {
+                box-shadow: 0 0 50px var(--primary-color);
+            }
+        }
+
+        .timeline-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.3);
+        }
+
+        .timeline-month {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .timeline-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .timeline-height {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-top: 15px;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 80px 40px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+            border-radius: 40px;
+            margin-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.1), transparent);
+            animation: ctaPulse 8s infinite;
+        }
+
+        @keyframes ctaPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-text {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50px;
+            color: var(--dark-bg);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.5);
+        }
+
+        /* Confidence Meter */
+        .confidence-meter {
+            margin: 50px 0;
+            text-align: center;
+        }
+
+        .confidence-circle {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .confidence-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .confidence-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 15;
+        }
+
+        .confidence-progress {
+            fill: none;
+            stroke: url(#gradient);
+            stroke-width: 15;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 2s ease;
+        }
+
+        .confidence-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .confidence-label {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Warning/Info Boxes */
+        .info-box {
+            background: rgba(0, 255, 255, 0.1);
+            border-left: 5px solid var(--primary-color);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .info-box.warning {
+            background: rgba(255, 165, 0, 0.1);
+            border-left-color: #ffa500;
+        }
+
+        .info-box.success {
+            background: rgba(0, 255, 136, 0.1);
+            border-left-color: var(--accent-color);
+        }
+
+        .info-box-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .info-box.warning .info-box-title {
+            color: #ffa500;
+        }
+
+        .info-box.success .info-box-title {
+            color: var(--accent-color);
+        }
+
+        .info-box-text {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .result-title {
+                font-size: 2.5rem;
+            }
+
+            .predicted-height {
+                font-size: 4rem;
+            }
+
+            .height-display {
+                padding: 50px 30px;
+            }
+
+            .scenario-title {
+                font-size: 2rem;
+            }
+
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline::before {
+                left: 30px;
+            }
+
+            .timeline-item:nth-child(odd) .timeline-content,
+            .timeline-item:nth-child(even) .timeline-content {
+                margin-left: 70px;
+                margin-right: 0;
+                padding-left: 30px;
+                padding-right: 30px;
+            }
+
+            .timeline-dot {
+                left: 30px;
+            }
+
+            .section-title {
+                font-size: 2.5rem;
+            }
+
+            .recommendations-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Additional Animations */
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-in-left {
+            animation: slideInLeft 0.8s ease-out;
+        }
+
+        .slide-in-right {
+            animation: slideInRight 0.8s ease-out;
+        }
+
+        /* Holographic Background */
+        .holographic-bg {
+            background: linear-gradient(135deg, 
+                rgba(0, 255, 255, 0.1) 0%,
+                rgba(255, 0, 255, 0.1) 25%,
+                rgba(0, 255, 136, 0.1) 50%,
+                rgba(255, 0, 255, 0.1) 75%,
+                rgba(0, 255, 255, 0.1) 100%);
+            background-size: 200% 200%;
+            animation: holographicShift 5s ease infinite;
+        }
+
+        @keyframes holographicShift {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        /* Data Summary Cards */
+        .data-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .data-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .data-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+        }
+
+        .data-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .data-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            animation: modalSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 40px 50px 30px;
+            border-bottom: 2px solid rgba(0, 255, 255, 0.2);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid rgba(255, 0, 0, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.5rem;
+            color: #ff4444;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #ff4444;
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .modal-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            animation: iconBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes iconBounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .modal-title {
+            font-size: 2.5rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-category {
+            display: inline-block;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--primary-color);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .modal-body {
+            padding: 40px 50px;
+        }
+
+        .modal-section {
+            margin-bottom: 40px;
+        }
+
+        .modal-section-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .modal-section-title::before {
+            content: '';
+            width: 5px;
+            height: 30px;
+            background: linear-gradient(180deg, var(--primary-color), var(--accent-color));
+            border-radius: 10px;
+        }
+
+        .modal-text {
+            font-size: 1.15rem;
+            line-height: 1.9;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .modal-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .modal-list li {
+            padding: 15px 0 15px 40px;
+            border-left: 3px solid var(--primary-color);
+            margin-bottom: 15px;
+            position: relative;
+            background: rgba(0, 255, 255, 0.05);
+            border-radius: 0 10px 10px 0;
+            padding-right: 20px;
+        }
+
+        .modal-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 15px;
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            color: var(--dark-bg);
+            margin-right: 15px;
+        }
+
+        .benefit-box {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 255, 0.1));
+            border: 2px solid var(--accent-color);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .benefit-box-title {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning-box {
+            background: rgba(255, 165, 0, 0.1);
+            border: 2px solid #ffa500;
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .warning-box-title {
+            font-size: 1.3rem;
+            color: #ffa500;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .timeline-steps {
+            margin: 30px 0;
+        }
+
+        .timeline-step {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .timeline-step:last-child {
+            border-bottom: none;
+        }
+
+        .timeline-step-number {
+            flex-shrink: 0;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--dark-bg);
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .timeline-step-content h4 {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .timeline-step-content p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .recommendation-card {
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recommendation-card::before {
+            content: '👁️ Click for Details';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .recommendation-card:hover::before {
+            opacity: 1;
+        }
+
+        .filter-section {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .filter-btn {
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            border-radius: 50px;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: var(--dark-bg);
+            border-color: transparent;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+        }
+
+        .recommendation-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 15px;
+            background: linear-gradient(45deg, var(--accent-color), var(--primary-color));
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--dark-bg);
+            z-index: 10;
+        }
+
+        /* Scrollbar Styling */
+        .modal-content::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--accent-color), var(--primary-color));
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="grid-overlay"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="nav-logo">GrowLabX</div>
+            <a href="index.html" class="back-btn">← Back to Home</a>
+        </nav>
+    </header>
+
+    <!-- Loading Screen -->
+    <div class="loading-container" id="loadingContainer">
+        <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+        </div>
+        <div class="loading-text" id="loadingText">Analyzing your genetic data...</div>
+        <div class="loading-subtext" id="loadingSubtext">Processing growth patterns and family history</div>
+    </div>
+
+    <!-- Results Container -->
+    <div class="results-container" id="resultsContainer">
+        <!-- Hero Result -->
+        <div class="result-hero">
+            <h1 class="result-title">Your Personalized Height Prediction</h1>
+            <p class="result-subtitle">Based on advanced genetic analysis and growth patterns</p>
+        </div>
+
+        <!-- Height Display -->
+        <div class="height-display">
+            <div class="current-height">Current Height: <span id="currentHeightDisplay">0 cm</span></div>
+            <div class="predicted-height" id="predictedHeight">0 cm</div>
+            <div class="height-range" id="heightRange">Range: 0 - 0 cm</div>
+            <div class="growth-potential" id="growthPotential">+0 cm Growth Potential</div>
+        </div>
+
+        <!-- Data Summary -->
+        <div class="data-summary" id="dataSummary"></div>
+
+        <!-- Scenario Card -->
+        <div class="scenario-card slide-in-left" id="scenarioCard">
+            <h2 class="scenario-title">
+                <span class="scenario-icon" id="scenarioIcon">🎯</span>
+                <span id="scenarioTitle">Your Growth Scenario</span>
+            </h2>
+            <p class="scenario-description" id="scenarioDescription"></p>
+            <div id="scenarioTags"></div>
+        </div>
+
+        <!-- Confidence Meter -->
+        <div class="confidence-meter">
+            <div class="confidence-circle">
+                <svg width="200" height="200">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#00ffff;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#00ff88;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle class="confidence-bg" cx="100" cy="100" r="85"></circle>
+                    <circle class="confidence-progress" cx="100" cy="100" r="85" 
+                            stroke-dasharray="534" stroke-dashoffset="534" id="confidenceCircle"></circle>
+                </svg>
+                <div class="confidence-text" id="confidencePercent">0%</div>
+            </div>
+            <div class="confidence-label">Prediction Confidence</div>
+        </div>
+
+        <!-- Analysis Grid -->
+        <h2 class="section-title">Detailed Factor Analysis</h2>
+        <div class="analysis-grid" id="analysisGrid"></div>
+
+        <!-- Growth Factors -->
+        <div class="scenario-card holographic-bg">
+            <h2 class="scenario-title">
+                <span class="scenario-icon">📊</span>
+                Growth Factor Breakdown
+            </h2>
+            <ul class="factor-list" id="factorList"></ul>
+        </div>
+
+        <!-- Info Boxes -->
+        <div id="infoBoxes"></div>
+
+        <!-- Timeline -->
+        <div class="timeline-section">
+            <h2 class="section-title">Growth Timeline Projection</h2>
+            <div class="timeline" id="timeline"></div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="recommendations-section">
+            <h2 class="section-title">Personalized Recommendations</h2>
+            <div class="recommendations-grid" id="recommendationsGrid"></div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to Maximize Your Growth?</h2>
+                <p class="cta-text">Get your personalized growth plan and start your transformation today</p>
+                <a href="plan.html" class="btn">Start Your Journey</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // User data from localStorage
+        let userData = {};
+        let predictionResult = {};
+
+        // Create background particles
+        function createParticles() {
+            const bg = document.querySelector('.animated-bg');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = Math.random() * 5 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = Math.random() * 10 + 10 + 's';
+                bg.appendChild(particle);
+            }
+        }
+
+        // Calculate height prediction
+        function calculateHeightPrediction(data) {
+            const age = parseInt(data.currentAge);
+            const currentHeight = parseInt(data.currentHeight);
+            const fatherHeight = parseInt(data.fatherHeight);
+            const motherHeight = parseInt(data.motherHeight);
+            const grandfatherHeight = parseInt(data.grandfatherHeight) || fatherHeight;
+            const uncleHeight = parseInt(data.uncleHeight) || fatherHeight;
+            const pubertyAge = parseInt(data.pubertyAge);
+            
+            // Calculate genetic potential
+            const midParentHeight = (fatherHeight + motherHeight) / 2;
+            const familyAverage = (fatherHeight + motherHeight + grandfatherHeight + uncleHeight) / 4;
+            
+            // Base genetic potential
+            let geneticPotential = midParentHeight + 10; // Add 10cm for next generation trend
+            
+            // Determine growth scenario
+            let scenario = determineScenario(data);
+            
+            // Calculate remaining growth potential based on age and puberty
+            let remainingGrowth = 0;
+            let maxGrowth = 0;
+            let minGrowth = 0;
+            let confidence = 0;
+            
+            // Age-based calculations
+            if (age <= 13) {
+                // Early adolescence - high growth potential
+                if (scenario.type === 'earlyBloomer') {
+                    remainingGrowth = scenario.growth * 0.7;
+                    maxGrowth = scenario.growth * 0.9;
+                    minGrowth = scenario.growth * 0.5;
+                    confidence = 75;
+                } else if (scenario.type === 'lateBloomer') {
+                    remainingGrowth = scenario.growth * 1.1;
+                    maxGrowth = scenario.growth * 1.3;
+                    minGrowth = scenario.growth * 0.9;
+                    confidence = 70;
+                } else {
+                    remainingGrowth = scenario.growth;
+                    maxGrowth = scenario.growth * 1.2;
+                    minGrowth = scenario.growth * 0.8;
+                    confidence = 80;
+                }
+            } else if (age <= 16) {
+                // Mid adolescence
+                if (scenario.type === 'lateBloomer') {
+                    remainingGrowth = scenario.growth * 1.0;
+                    maxGrowth = scenario.growth * 1.2;
+                    minGrowth = scenario.growth * 0.8;
+                    confidence = 75;
+                } else if (scenario.type === 'earlyBloomer') {
+                    remainingGrowth = scenario.growth * 0.5;
+                    maxGrowth = scenario.growth * 0.7;
+                    minGrowth = scenario.growth * 0.3;
+                    confidence = 80;
+                } else {
+                    remainingGrowth = scenario.growth * 0.8;
+                    maxGrowth = scenario.growth * 1.0;
+                    minGrowth = scenario.growth * 0.6;
+                    confidence = 85;
+                }
+            } else if (age <= 18) {
+                // Late adolescence
+                if (scenario.type === 'lateBloomer') {
+                    remainingGrowth = scenario.growth * 0.8;
+                    maxGrowth = scenario.growth * 1.0;
+                    minGrowth = scenario.growth * 0.6;
+                    confidence = 80;
+                } else {
+                    remainingGrowth = scenario.growth * 0.4;
+                    maxGrowth = scenario.growth * 0.6;
+                    minGrowth = scenario.growth * 0.2;
+                    confidence = 85;
+                }
+            } else if (age <= 21) {
+                // Very late growth
+                if (scenario.type === 'lateBloomer' && data.bodyType === 'lanky') {
+                    remainingGrowth = scenario.growth * 0.5;
+                    maxGrowth = scenario.growth * 0.7;
+                    minGrowth = scenario.growth * 0.3;
+                    confidence = 70;
+                } else {
+                    remainingGrowth = scenario.growth * 0.2;
+                    maxGrowth = scenario.growth * 0.4;
+                    minGrowth = scenario.growth * 0.1;
+                    confidence = 75;
+                }
+            } else {
+                // Minimal growth expected
+                remainingGrowth = scenario.growth * 0.1;
+                maxGrowth = scenario.growth * 0.2;
+                minGrowth = 0;
+                confidence = 90;
+            }
+            
+            // Calculate final predictions
+            const predictedHeight = Math.round(currentHeight + remainingGrowth);
+            const maxHeight = Math.round(currentHeight + maxGrowth);
+            const minHeight = Math.round(currentHeight + minGrowth);
+            
+            return {
+                current: currentHeight,
+                predicted: predictedHeight,
+                min: minHeight,
+                max: maxHeight,
+                growth: Math.round(remainingGrowth),
+                confidence: confidence,
+                scenario: scenario,
+                geneticPotential: Math.round(geneticPotential),
+                familyAverage: Math.round(familyAverage)
+            };
+        }
+
+        // Determine growth scenario
+        function determineScenario(data) {
+            const age = parseInt(data.currentAge);
+            const pubertyAge = parseInt(data.pubertyAge);
+            const fatherHeight = parseInt(data.fatherHeight);
+            const motherHeight = parseInt(data.motherHeight);
+            const grandfatherHeight = parseInt(data.grandfatherHeight) || fatherHeight;
+            const uncleHeight = parseInt(data.uncleHeight) || fatherHeight;
+            const bodyType = data.bodyType;
+            const bodyHair = data.bodyHair;
+            const diet = data.diet;
+            const sleep = data.sleep;
+            
+            const familyAverage = (fatherHeight + motherHeight + grandfatherHeight + uncleHeight) / 4;
+            const isTallFamily = familyAverage > 175;
+            const isVeryTallFamily = familyAverage > 180;
+            
+            // Scenario 1: Optimal Growth - Young, Late Bloomer, Tall Family, Great Habits
+            if (age <= 14 && pubertyAge >= 13 && isVeryTallFamily && bodyType === 'lanky' && 
+                (diet === 'nonveg' || diet === 'vegetarian') && (sleep === '8-9' || sleep === '10+')) {
+                return {
+                    type: 'lateBloomer',
+                    name: 'Optimal Late Bloomer',
+                    growth: 20,
+                    icon: '🚀',
+                    description: 'You have exceptional growth potential! Your late puberty onset combined with tall genetics, optimal nutrition, and excellent sleep habits create perfect conditions for significant height gain.',
+                    tags: ['Late Bloomer', 'Tall Genetics', 'Optimal Habits', 'High Potential'],
+                    color: 'success'
+                };
+            }
+            
+            // Scenario 2: Strong Late Bloomer - Young, Late Puberty, Tall Family
+            if (age <= 15 && pubertyAge >= 13 && isTallFamily && bodyType === 'lanky') {
+                return {
+                    type: 'lateBloomer',
+                    name: 'Strong Late Bloomer',
+                    growth: 18,
+                    icon: '⭐',
+                    description: 'Your late puberty combined with tall family genetics positions you for excellent growth. Your lanky build indicates growth plates may still be very active.',
+                    tags: ['Late Bloomer', 'Tall Family', 'Active Growth Plates'],
+                    color: 'success'
+                };
+            }
+            
+            // Scenario 3: Classic Late Bloomer - Late Puberty, Good Genetics
+            if (pubertyAge >= 14 && age <= 16 && isTallFamily) {
+                return {
+                    type: 'lateBloomer',
+                    name: 'Classic Late Bloomer',
+                    growth: 16,
+                    icon: '🌟',
+                    description: 'Late puberty onset means your growth plates stayed open longer. Combined with good family height, you have strong potential for continued growth.',
+                    tags: ['Late Bloomer', 'Extended Growth Window'],
+                    color: 'success'
+                };
+            }
+            
+            // Scenario 4: Optimal Young Grower - Very Young, Good Everything
+            if (age <= 13 && (diet === 'nonveg' || diet === 'vegetarian') && 
+                (sleep === '8-9' || sleep === '10+') && bodyType !== 'overweight') {
+                return {
+                    type: 'youngOptimal',
+                    name: 'Optimal Young Grower',
+                    growth: 17,
+                    icon: '💫',
+                    description: 'You are at the perfect age for growth with excellent habits. Your nutrition and sleep optimization will maximize your genetic potential.',
+                    tags: ['Peak Growth Age', 'Optimal Habits', 'High Potential'],
+                    color: 'success'
+                };
+            }
+            
+            // Scenario 5: Tall Genetics Advantage - Very Tall Family
+            if (isVeryTallFamily && age <= 16) {
+                return {
+                    type: 'tallGenetics',
+                    name: 'Strong Genetic Advantage',
+                    growth: 15,
+                    icon: '🧬',
+                    description: 'Your family genetics show consistently tall heights. This genetic predisposition gives you a strong foundation for continued growth.',
+                    tags: ['Tall Genetics', 'Family Pattern', 'Good Potential'],
+                    color: 'success'
+                };
+            }
+            
+            // Scenario 6: Lanky Advantage - Lanky Build, Young
+            if (bodyType === 'lanky' && age <= 16 && bodyHair !== 'full') {
+                return {
+                    type: 'lankyGrower',
+                    name: 'Lanky Grower Profile',
+                    growth: 14,
+                    icon: '📏',
+                    description: 'Your lanky build suggests ectomorphic body type, which typically experiences longer growth periods. Growth plates likely still very active.',
+                    tags: ['Lanky Build', 'Active Growth', 'Extended Window'],
+                    color: 'success'
+                };
+            }
+            
+            // Scenario 7: Nutrition Optimized - Great Diet, Young
+            if ((diet === 'nonveg') && age <= 15 && (sleep === '8-9' || sleep === '10+')) {
+                return {
+                    type: 'nutritionOptimized',
+                    name: 'Nutrition-Optimized Growth',
+                    growth: 13,
+                    icon: '🥗',
+                    description: 'Your protein-rich diet and excellent sleep provide optimal conditions for HGH production and growth. These factors significantly enhance growth potential.',
+                    tags: ['Optimal Nutrition', 'Great Sleep', 'HGH Production'],
+                    color: 'success'
+                };
+            }
+            
+            // Scenario 8: Sleep Advantage - Excellent Sleep, Young
+            if ((sleep === '8-9' || sleep === '10+') && age <= 16 && bodyType !== 'overweight') {
+                return {
+                    type: 'sleepOptimized',
+                    name: 'Sleep-Optimized Growth',
+                    growth: 12,
+                    icon: '😴',
+                    description: 'Your excellent sleep habits maximize growth hormone secretion during deep sleep phases. This is crucial for height development.',
+                    tags: ['Optimal Sleep', 'HGH Secretion', 'Good Habits'],
+                    color: 'success'
+                };
+            }
+            
+            // Scenario 9: Standard Growth - Average Everything, Young
+            if (age <= 15 && pubertyAge >= 11 && pubertyAge <= 13) {
+                return {
+                    type: 'standard',
+                    name: 'Standard Growth Pattern',
+                    growth: 11,
+                    icon: '📈',
+                    description: 'You are following a normal growth trajectory. With some optimization of diet and sleep, you can maximize your remaining growth potential.',
+                    tags: ['Normal Pattern', 'Growth Potential', 'Room for Optimization'],
+                    color: 'info'
+                };
+            }
+            
+            // Scenario 10: Early Bloomer - Early Puberty but Young
+            if (pubertyAge <= 11 && age <= 14 && bodyType === 'lanky') {
+                return {
+                    type: 'earlyBloomer',
+                    name: 'Early Bloomer Recovery',
+                    growth: 10,
+                    icon: '⚡',
+                    description: 'Despite early puberty, your young age and lanky build suggest you still have growth potential. Focus on maximizing remaining growth window.',
+                    tags: ['Early Puberty', 'Young Age', 'Some Potential'],
+                    color: 'warning'
+                };
+            }
+            
+            // Scenario 11: Mid-Teen Standard - 15-16, Normal Factors
+            if (age >= 15 && age <= 16 && isTallFamily) {
+                return {
+                    type: 'midTeen',
+                    name: 'Mid-Teen Growth Phase',
+                    growth: 9,
+                    icon: '🎯',
+                    description: 'You are in mid-adolescence with continued growth expected. Tall family genetics support ongoing development.',
+                    tags: ['Mid-Adolescence', 'Continued Growth', 'Family Support'],
+                    color: 'info'
+                };
+            }
+            
+            // Scenario 12: Late Teen Late Bloomer - 17-18, Late Puberty
+            if (age >= 17 && age <= 18 && pubertyAge >= 14 && bodyType === 'lanky') {
+                return {
+                    type: 'lateTeenLateBloomer',
+                    name: 'Late Teen Late Bloomer',
+                    growth: 8,
+                    icon: '🌙',
+                    description: 'Your late puberty means growth plates may still be partially open. Some growth still possible, especially with optimization.',
+                    tags: ['Late Bloomer', 'Partial Window', 'Optimization Key'],
+                    color: 'warning'
+                };
+            }
+            
+            // Scenario 13: Vegetarian Optimization - Vegetarian, Young, Good Sleep
+            if (diet === 'vegetarian' && age <= 15 && (sleep === '8-9' || sleep === '10+')) {
+                return {
+                    type: 'vegetarianOptimized',
+                    name: 'Vegetarian Growth Path',
+                    growth: 11,
+                    icon: '🥦',
+                    description: 'With proper protein supplementation and excellent sleep, vegetarian diet can support good growth. Focus on complete proteins and B12.',
+                    tags: ['Vegetarian', 'Protein Focus', 'Good Habits'],
+                    color: 'info'
+                };
+            }
+            
+            // Scenario 14: Body Development Based - Minimal Hair, Young
+            if (bodyHair === 'none' || bodyHair === 'minimal' && age <= 15) {
+                return {
+                    type: 'earlyDevelopment',
+                    name: 'Early Development Stage',
+                    growth: 13,
+                    icon: '🌱',
+                    description: 'Minimal secondary sexual characteristics suggest you are in early-mid puberty. Significant growth window still ahead.',
+                    tags: ['Early Puberty', 'Wide Window', 'High Potential'],
+                    color: 'success'
+                };
+            }
+            
+            // Scenario 15: Skinny Advantage - Skinny, Young
+            if (bodyType === 'skinny' && age <= 16 && (diet === 'nonveg' || diet === 'vegetarian')) {
+                return {
+                    type: 'skinnyGrower',
+                    name: 'Lean Growth Profile',
+                    growth: 12,
+                    icon: '🏃',
+                    description: 'Your lean build with good nutrition creates favorable conditions for growth. Focus on protein intake to support development.',
+                    tags: ['Lean Build', 'Good Nutrition', 'Growth Potential'],
+                    color: 'success'
+                };
+            }
+            
+            // Scenario 16: Late Teen Good Genetics - 17-19, Tall Family
+            if (age >= 17 && age <= 19 && isVeryTallFamily && bodyHair !== 'full') {
+                return {
+                    type: 'lateTeenGenetics',
+                    name: 'Late Teen Genetic Boost',
+                    growth: 7,
+                    icon: '🧪',
+                    description: 'Strong family genetics may support some continued growth into late teens. Growth plates may not be fully fused yet.',
+                    tags: ['Late Teen', 'Tall Genetics', 'Limited Window'],
+                    color: 'warning'
+                };
+            }
+            
+            // Scenario 17: Optimization Needed - Poor Habits, Young
+            if (age <= 15 && (sleep === '4-5' || sleep === '6-7') && diet === 'vegan') {
+                return {
+                    type: 'needsOptimization',
+                    name: 'Optimization Opportunity',
+                    growth: 8,
+                    icon: '⚠️',
+                    description: 'You have growth potential but current habits may be limiting. Improving sleep and ensuring complete nutrition can significantly boost growth.',
+                    tags: ['Needs Improvement', 'High Upside', 'Optimization Critical'],
+                    color: 'warning'
+                };
+            }
+            
+            // Scenario 18: Young Adult Phase - 19-21
+            if (age >= 19 && age <= 21 && pubertyAge >= 14) {
+                return {
+                    type: 'youngAdult',
+                    name: 'Young Adult Phase',
+                    growth: 5,
+                    icon: '🎓',
+                    description: 'Some minor growth may still occur, especially in spine and posture improvement. Focus on maximizing current height through posture.',
+                    tags: ['Young Adult', 'Minimal Growth', 'Posture Focus'],
+                    color: 'warning'
+                };
+            }
+            
+            // Scenario 19: Overweight Category - Needs Weight Management
+            if (bodyType === 'overweight' && age <= 16) {
+                return {
+                    type: 'weightManagement',
+                    name: 'Weight Management Path',
+                    growth: 9,
+                    icon: '⚖️',
+                    description: 'Weight management can improve growth hormone production. Losing excess weight may unlock additional growth potential.',
+                    tags: ['Weight Management', 'HGH Optimization', 'Lifestyle Change'],
+                    color: 'warning'
+                };
+            }
+            
+            // Scenario 20: Default Standard Growth
+            return {
+                type: 'standard',
+                name: 'Standard Growth Potential',
+                growth: 10,
+                icon: '📊',
+                description: 'Based on your profile, you have moderate growth potential. Optimizing diet, sleep, and exercise can help maximize this potential.',
+                tags: ['Standard Pattern', 'Moderate Potential', 'Optimization Beneficial'],
+                color: 'info'
+            };
+        }
+
+        // Get factor scores
+        function getFactorScores(data, scenario) {
+            const factors = [];
+            
+            // Genetic Factor
+            const fatherHeight = parseInt(data.fatherHeight);
+            const motherHeight = parseInt(data.motherHeight);
+            const familyAvg = (fatherHeight + motherHeight + 
+                              (parseInt(data.grandfatherHeight) || fatherHeight) +
+                              (parseInt(data.uncleHeight) || fatherHeight)) / 4;
+            const geneticScore = Math.min(100, ((familyAvg - 160) / 30) * 100);
+            factors.push({
+                name: 'Genetic Potential',
+                score: Math.max(0, Math.round(geneticScore)),
+                description: familyAvg > 175 ? 'Strong family height genetics' : familyAvg > 170 ? 'Good genetic foundation' : 'Average genetic baseline'
+            });
+            
+            // Age Factor
+            const age = parseInt(data.currentAge);
+            const ageScore = age <= 14 ? 95 : age <= 16 ? 80 : age <= 18 ? 60 : age <= 21 ? 30 : 10;
+            factors.push({
+                name: 'Age Factor',
+                score: ageScore,
+                description: age <= 14 ? 'Peak growth age' : age <= 16 ? 'Good growth window' : age <= 18 ? 'Late adolescence' : 'Limited window'
+            });
+            
+            // Puberty Timing
+            const pubertyAge = parseInt(data.pubertyAge);
+            const pubertyScore = pubertyAge >= 14 ? 90 : pubertyAge >= 13 ? 80 : pubertyAge >= 12 ? 70 : pubertyAge >= 11 ? 60 : 40;
+            factors.push({
+                name: 'Puberty Timing',
+                score: pubertyScore,
+                description: pubertyAge >= 14 ? 'Late bloomer advantage' : pubertyAge >= 12 ? 'Normal timing' : 'Early bloomer'
+            });
+            
+            // Nutrition
+            const nutritionScore = data.diet === 'nonveg' ? 90 : data.diet === 'vegetarian' ? 75 : 60;
+            factors.push({
+                name: 'Nutrition Quality',
+                score: nutritionScore,
+                description: data.diet === 'nonveg' ? 'Optimal protein intake' : data.diet === 'vegetarian' ? 'Good with supplements' : 'Needs protein boost'
+            });
+            
+            // Sleep Quality
+            const sleepScore = data.sleep === '10+' ? 95 : data.sleep === '8-9' ? 90 : data.sleep === '6-7' ? 60 : 30;
+            factors.push({
+                name: 'Sleep Quality',
+                score: sleepScore,
+                description: sleepScore >= 90 ? 'Optimal HGH production' : sleepScore >= 60 ? 'Adequate sleep' : 'Sleep improvement needed'
+            });
+            
+            // Body Type
+            const bodyTypeScore = data.bodyType === 'lanky' ? 85 : data.bodyType === 'skinny' ? 80 : 
+                                 data.bodyType === 'normal' ? 70 : data.bodyType === 'muscular' ? 60 : 40;
+            factors.push({
+                name: 'Body Composition',
+                score: bodyTypeScore,
+                description: data.bodyType === 'lanky' ? 'Ideal for growth' : data.bodyType === 'skinny' ? 'Good for growth' : 
+                            data.bodyType === 'normal' ? 'Balanced physique' : data.bodyType === 'muscular' ? 'Athletic build' : 'Weight management needed'
+            });
+            
+            // Body Development
+            const hairScore = data.bodyHair === 'none' ? 90 : data.bodyHair === 'minimal' ? 85 : 
+                            data.bodyHair === 'moderate' ? 70 : data.bodyHair === 'significant' ? 50 : 30;
+            factors.push({
+                name: 'Development Stage',
+                score: hairScore,
+                description: hairScore >= 85 ? 'Early-mid puberty' : hairScore >= 70 ? 'Mid puberty' : 
+                            hairScore >= 50 ? 'Late puberty' : 'Advanced development'
+            });
+            
+            return factors;
+        }
+
+        // Create analysis cards
+        function createAnalysisCards(data, result) {
+            const analysisGrid = document.getElementById('analysisGrid');
+            
+            const cards = [
+                {
+                    icon: '🧬',
+                    title: 'Genetic Potential',
+                    description: `Your family height genetics provide a strong foundation. With an average family height of ${result.familyAverage}cm, your genetic ceiling is favorable.`,
+                    value: `${result.geneticPotential} cm`
+                },
+                {
+                    icon: '⏰',
+                    title: 'Growth Window',
+                    description: result.scenario.type === 'lateBloomer' ? 
+                        'Late puberty gives you an extended growth window. Your plates likely stayed open longer.' :
+                        result.scenario.type === 'earlyBloomer' ?
+                        'Early puberty shortened your window, but optimization can help maximize remaining time.' :
+                        'You have a standard growth window. Focus on maximizing this period.',
+                    value: `${data.currentAge} years`
+                },
+                {
+                    icon: '📊',
+                    title: 'Current Progress',
+                    description: `You are currently at ${data.currentHeight}cm. Based on your age and development, you have completed approximately ${Math.round((parseInt(data.currentAge) / 18) * 100)}% of your growth journey.`,
+                    value: `${Math.round((parseInt(data.currentAge) / 18) * 100)}%`
+                },
+                {
+                    icon: '🎯',
+                    title: 'Optimization Impact',
+                    description: 'By optimizing sleep, nutrition, and exercise, you can potentially add 2-5cm to your genetic baseline. Consistency is key.',
+                    value: '+2-5 cm'
+                }
+            ];
+            
+            cards.forEach(card => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'analysis-card';
+                cardEl.innerHTML = `
+                    <div class="analysis-icon">${card.icon}</div>
+                    <h3 class="analysis-title">${card.title}</h3>
+                    <p class="analysis-description">${card.description}</p>
+                    <div class="analysis-value">${card.value}</div>
+                `;
+                analysisGrid.appendChild(cardEl);
+            });
+        }
+
+        // Create timeline
+        function createTimeline(data, result) {
+            const timeline = document.getElementById('timeline');
+            const currentAge = parseInt(data.currentAge);
+            const currentHeight = parseInt(data.currentHeight);
+            const monthlyGrowth = result.growth / 12; // Distribute growth over a year
+            
+            const months = ['3 Months', '6 Months', '9 Months', '12 Months'];
+            const predictions = [
+                { month: months[0], growth: monthlyGrowth * 3, description: 'Initial growth phase with optimized habits' },
+                { month: months[1], growth: monthlyGrowth * 6, description: 'Continued steady growth with proper nutrition' },
+                { month: months[2], growth: monthlyGrowth * 9, description: 'Sustained growth with lifestyle optimization' },
+                { month: months[3], growth: monthlyGrowth * 12, description: 'Complete growth cycle with maximum potential' }
+            ];
+            
+            predictions.forEach((pred, index) => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item';
+                timelineItem.innerHTML = `
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-month">${pred.month}</div>
+                        <div class="timeline-description">${pred.description}</div>
+                        <div class="timeline-height">Expected: ${Math.round(currentHeight + pred.growth)} cm (+${Math.round(pred.growth)} cm)</div>
+                    </div>
+                `;
+                timeline.appendChild(timelineItem);
+            });
+        }
+
+        // Create recommendations
+        function createRecommendations(data, scenario) {
+            const recommendationsGrid = document.getElementById('recommendationsGrid');
+            
+ let baseRecommendations = [
+        {
+            number: '01',
+            title: 'Optimize Sleep Schedule',
+            description: 'Aim for 8-10 hours of quality sleep. Growth hormone secretion peaks during deep sleep, especially between 11 PM and 2 AM. Maintain consistent sleep-wake times.'
+        },
+        {
+            number: '02',
+            title: 'Protein-Rich Nutrition',
+            description: 'Consume 1.5-2g of protein per kg body weight. Include eggs, lean meats, dairy, legumes, and nuts. Protein is essential for growth and tissue development.'
+        },
+        {
+            number: '03',
+            title: 'Calcium & Vitamin D',
+            description: 'Ensure adequate calcium (1000-1300mg daily) and Vitamin D (600-1000 IU). These are crucial for bone growth and density. Get sunlight exposure daily.'
+        },
+        {
+            number: '04',
+            title: 'Stretching Exercises',
+            description: 'Practice daily stretching routines focusing on spine decompression. Include hanging exercises, cobra stretches, and swimming 3-4 times per week.'
+        },
+        {
+            number: '05',
+            title: 'Posture Correction',
+            description: 'Maintain proper posture throughout the day. Slouching can compress your spine and reduce height. Practice core strengthening exercises.'
+        },
+        {
+            number: '06',
+            title: 'Avoid Growth Inhibitors',
+            description: 'Limit caffeine, avoid smoking and alcohol completely. These substances can interfere with growth hormone production and bone development.'
+        }
+    ];
+    
+    // SCENARIO SPECIFIC TIPS - 3 per scenario nigga
+    if (scenario.type === 'lateBloomer') {
+        baseRecommendations.push(
+            {
+                number: '10',
+                title: 'MAX THE WINDOW NIGGA',
+                description: 'You a certified late bloomer god, inject peptides/HGH/IGF-1 stack ASAP before plates close. Late puberty is the ultimate heightmaxxing cheat code fr.'
+            },
+            {
+                number: '11',
+                title: 'Dead Hang Like A Monkey',
+                description: 'Hang from a bar 3x a day 30+ seconds. Compress that shit less and let gravity pull your spine longer. Tall family + lanky = you still got rocket fuel left.'
+            },
+            {
+                number: '12',
+                title: 'Protein + Milk = Height Slut',
+                description: 'Chug whole milk like its the only pussy you getting. 1 gallon a day if possible. Grow taller than all them early bloomer chads who already dried up.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'youngOptimal') {
+        baseRecommendations.push(
+            {
+                number: '13',
+                title: 'Prime Growth Age Bro',
+                description: 'You young as fuck with perfect habits — this the golden window. Eat like a horse, sleep like a baby, you gonna mog your dad height.'
+            },
+            {
+                number: '14',
+                title: 'Sprint + Jump Rope',
+                description: 'High intensity sprints and jump rope daily. Explosive movements = max HGH release. Turn into a tall lanky fuckboy.'
+            },
+            {
+                number: '15',
+                title: 'NoFap For Growth',
+                description: 'Stop draining your life force to 2D whores. Retain that nut energy for height gains. Real kings save it for becoming 6\'3+.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'tallGenetics') {
+        baseRecommendations.push(
+            {
+                number: '16',
+                title: 'Genetics Carrying You',
+                description: 'Your bloodline already tall as fuck. Just dont fuck it up with bad habits and you winning the height lottery nigga.'
+            },
+            {
+                number: '17',
+                title: 'Heavy Lifting',
+                description: 'Lift heavy but smart — squats, deads, overhead press. Build frame so you dont look like a tall stick.'
+            },
+            {
+                number: '18',
+                title: 'Sun + Sleep Stack',
+                description: 'Morning sunlight + 10hrs sleep = god tier HGH. Your tall family genes about to cook.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'lankyGrower') {
+        baseRecommendations.push(
+            {
+                number: '19',
+                title: 'Lanky = Late Growth King',
+                description: 'Ectomorph lanklet detected. Your growth plates lazy asf but still open. Milk this shit before you become forever 5\'10 cope.'
+            },
+            {
+                number: '20',
+                title: 'Eat Big To Get Big',
+                description: 'Bulk hard nigga, 4000+ cals. Skinny fat is death, get tall and jacked.'
+            },
+            {
+                number: '21',
+                title: 'Yoga For Spine',
+                description: 'Daily yoga + hanging. Decompress dat shit and add easy 1-2 inches posturemaxx.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'nutritionOptimized') {
+        baseRecommendations.push(
+            {
+                number: '22',
+                title: 'Meatmaxx Hard',
+                description: 'Nonveg king, keep smashing chicken eggs beef. Protein = growth fuel. Vegetarians stay manlets.'
+            },
+            {
+                number: '23',
+                title: 'HGH Foods',
+                description: 'Pineapple, nuts, eggs before bed. Natural HGH boosters while you sleep like a baby.'
+            },
+            {
+                number: '24',
+                title: 'Track Macros',
+                description: 'Dont guess nigga, track every calorie. Consistency turns average into 6ft+ chad.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'sleepOptimized') {
+        baseRecommendations.push(
+            {
+                number: '25',
+                title: 'Sleep = Free Height',
+                description: 'You already sleeping good, now make it elite. Blackout room, no phone, become a sleepchad.'
+            },
+            {
+                number: '26',
+                title: 'Magnesium + ZMA',
+                description: 'Pop magnesium glycinate before bed. Deeper sleep = more HGH = taller you.'
+            },
+            {
+                number: '27',
+                title: 'Power Nap Game',
+                description: 'Add afternoon naps. Every extra deep sleep hour is free heightmaxxing.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'standard') {
+        baseRecommendations.push(
+            {
+                number: '28',
+                title: 'Average To Chad Arc',
+                description: 'You mid but can still mog. Optimize everything and ascend past your genetic prison.'
+            },
+            {
+                number: '29',
+                title: 'Swim Daily',
+                description: 'Swimming stretches the whole body. Do it or stay average height slave.'
+            },
+            {
+                number: '30',
+                title: 'Posturemaxx Obsessively',
+                description: 'Wall angels + shoulder blade squeezes. Fake 2 inches until real growth hits.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'earlyBloomer') {
+        baseRecommendations.push(
+            {
+                number: '31',
+                title: 'Damage Control Mode',
+                description: 'Early puberty fucked you a bit but you still young. Go hard on everything left.'
+            },
+            {
+                number: '32',
+                title: 'Avoid Estrogen Shit',
+                description: 'No soy, no plastics, no fat. Keep testosterone high for last growth spurt.'
+            },
+            {
+                number: '33',
+                title: 'Intense Sports',
+                description: 'Basketball or volleyball. Use your remaining window like a desperate manlet.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'midTeen') {
+        baseRecommendations.push(
+            {
+                number: '34',
+                title: 'Peptides Time',
+                description: 'MK677, HGH, IGF-1. Mid teen is when real heightmaxxers start stacking.'
+            },
+            {
+                number: '35',
+                title: 'Leg Day Everyday',
+                description: 'Train legs heavy. Bigger frame supports more height gains.'
+            },
+            {
+                number: '36',
+                title: 'No More Copium',
+                description: 'Stop jerking off to models and start working. This your last big chance nigga.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'lateTeenLateBloomer') {
+        baseRecommendations.push(
+            {
+                number: '37',
+                title: 'Last Chance Saloon',
+                description: '17-18 late bloomer? Plates might still be open. Go nuclear on protocol.'
+            },
+            {
+                number: '38',
+                title: 'HGH + CJC1295',
+                description: 'Research peptides if you serious. Dont be poor and short forever.'
+            },
+            {
+                number: '39',
+                title: 'Spine Decompression Max',
+                description: 'Inversion table + hanging. Squeeze every last mm out of this bitch.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'vegetarianOptimized') {
+        baseRecommendations.push(
+            {
+                number: '40',
+                title: 'Milk Is Your Friend',
+                description: 'Stop being half ass vegetarian, drink real dairy like a growing boy.'
+            },
+            {
+                number: '41',
+                title: 'Eggs + Paneer Grind',
+                description: 'Load up on eggs paneer whey. Vegetarian heightmaxx is possible but harder.'
+            },
+            {
+                number: '42',
+                title: 'B12 + D3 Mandatory',
+                description: 'Supplement or you stay weak and short. No excuses.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'earlyDevelopment') {
+        baseRecommendations.push(
+            {
+                number: '43',
+                title: 'Puberty Just Starting',
+                description: 'Minimal hair = massive window ahead. You about to explode upwards.'
+            },
+            {
+                number: '44',
+                title: 'Eat Like A Beast',
+                description: 'Caloric surplus + protein. Feed the growth spurt like its your last meal.'
+            },
+            {
+                number: '45',
+                title: 'Basketballmaxx',
+                description: 'Play ball daily. Fun + height gains. Become the tall lanky dude girls stare at.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'skinnyGrower') {
+        baseRecommendations.push(
+            {
+                number: '46',
+                title: 'Bulk Like Crazy',
+                description: 'Skinny = easy height but need mass. Eat 5000 cals and lift.'
+            },
+            {
+                number: '47',
+                title: 'GOMAD Protocol',
+                description: 'Gallon Of Milk A Day. Classic heightmaxx hack.'
+            },
+            {
+                number: '48',
+                title: 'Dont Stay Skinnyfat',
+                description: 'Get jacked while growing. Tall + muscular = pussy magnet.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'lateTeenGenetics') {
+        baseRecommendations.push(
+            {
+                number: '49',
+                title: 'Genetics Still Saving You',
+                description: 'Very tall family at 17-19? Plates might not be fully closed. Push it.'
+            },
+            {
+                number: '50',
+                title: 'Heavy Compounds',
+                description: 'Deadlifts + squats for testosterone + growth signal.'
+            },
+            {
+                number: '51',
+                title: 'Last HGH Window',
+                description: 'If money allows, mild HGH. Otherwise max natural and pray.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'needsOptimization') {
+        baseRecommendations.push(
+            {
+                number: '52',
+                title: 'Fix Your Shit Retard',
+                description: 'Bad sleep + vegan = self sabotage. Stop playing games at 3am and grow.'
+            },
+            {
+                number: '53',
+                title: 'Sleep 10hrs Minimum',
+                description: 'Fix sleep first. Everything else useless without it.'
+            },
+            {
+                number: '54',
+                title: 'Quit Veganism',
+                description: 'Add meat/dairy or stay short king. Your choice nigga.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'youngAdult') {
+        baseRecommendations.push(
+            {
+                number: '55',
+                title: 'Growth Mostly Done',
+                description: '19-21 late puberty? Minor gains possible but cope with posturemaxx + LL surgery fund.'
+            },
+            {
+                number: '56',
+                title: 'Posture Is Everything',
+                description: 'Fix forward head and rounded shoulders. Fake 1.5 inches instantly.'
+            },
+            {
+                number: '57',
+                title: 'Gym + Confidence',
+                description: 'Cant grow taller? Grow wider and richer. Women still fuck tall enough + high value.'
+            }
+        );
+    }
+    
+    if (scenario.type === 'weightManagement') {
+        baseRecommendations.push(
+            {
+                number: '58',
+                title: 'Cut The Fat First',
+                description: 'Lose weight = better HGH + less estrogen. Fat manlets grow less.'
+            },
+            {
+                number: '59',
+                title: 'Cardio + Lift',
+                description: 'Deficit + weights. Get lean then bulk while growing.'
+            },
+            {
+                number: '60',
+                title: 'No More Excuses',
+                description: 'Drop the weight and watch height potential unlock. You got this fat fuck.'
+            }
+        );
+    }
+    
+    // Default tips if nothing matches
+    if (baseRecommendations.length <= 10) {  // fallback
+        baseRecommendations.push(
+            {
+                number: '61',
+                title: 'General Heightmaxx',
+                description: 'Eat sleep lift repeat. Stop being a lazy manlet.'
+            },
+            {
+                number: '62',
+                title: 'Mewing + Posture',
+                description: 'Mew and stand straight. Small gains add up.'
+            },
+            {
+                number: '63',
+                title: 'Stay Consistent',
+                description: '6 months of perfect habits or stay coping forever.'
+            }
+        );
+    }
+            
+            baseRecommendations.forEach(rec => {
+                const card = document.createElement('div');
+                card.className = 'recommendation-card';
+                card.innerHTML = `
+                    
+                    <h3 class="recommendation-title">${rec.title}</h3>
+                    <p class="recommendation-description">${rec.description}</p>
+                `;
+                recommendationsGrid.appendChild(card);
+            });
+        }
+
+        // Create info boxes
+        function createInfoBoxes(data, result) {
+            const infoBoxes = document.getElementById('infoBoxes');
+            
+            // Success box
+            if (result.confidence >= 75 && result.growth >= 10) {
+                const successBox = document.createElement('div');
+                successBox.className = 'info-box success';
+                successBox.innerHTML = `
+                    <div class="info-box-title">✨ Excellent Growth Potential</div>
+                    <div class="info-box-text">
+                        Your profile indicates strong potential for significant height gain. By consistently following the recommended lifestyle optimizations, 
+                        you have a high probability of reaching the upper end of your predicted range. Stay committed to your growth journey!
+                    </div>
+                `;
+                infoBoxes.appendChild(successBox);
+            }
+            
+            // Warning for poor habits
+            if (data.sleep === '4-5' || data.sleep === '6-7') {
+                const warningBox = document.createElement('div');
+                warningBox.className = 'info-box warning';
+                warningBox.innerHTML = `
+                    <div class="info-box-title">⚠️ Sleep Optimization Critical</div>
+                    <div class="info-box-text">
+                        Your current sleep duration is significantly impacting your growth potential. Growth hormone secretion occurs primarily during 
+                        deep sleep. Increasing your sleep to 8-10 hours could add 2-4cm to your final height. This should be your #1 priority.
+                    </div>
+                `;
+                infoBoxes.appendChild(warningBox);
+            }
+            
+            // Info for late bloomers
+            if (result.scenario.type === 'lateBloomer') {
+                const infoBox = document.createElement('div');
+                infoBox.className = 'info-box';
+                infoBox.innerHTML = `
+                    <div class="info-box-title">💡 Late Bloomer Advantage</div>
+                    <div class="info-box-text">
+                        Your late puberty onset is actually an advantage! Later puberty means your growth plates stayed open longer, 
+                        giving you more time to grow. Many late bloomers continue growing into their late teens and even early twenties. 
+                        Focus on maintaining optimal habits throughout this extended window.
+                    </div>
+                `;
+                infoBoxes.appendChild(infoBox);
+            }
+            
+            // Genetic insight
+            const geneticBox = document.createElement('div');
+            geneticBox.className = 'info-box';
+            geneticBox.innerHTML = `
+                <div class="info-box-title">🧬 Understanding Your Genetics</div>
+                <div class="info-box-text">
+                    Height is approximately 80% genetic and 20% environmental. Your family's average height is ${result.familyAverage}cm, 
+                    which provides your baseline. The environmental 20% (nutrition, sleep, exercise, stress) is what you can optimize to 
+                    reach your maximum genetic potential. Even small improvements in these areas can add several centimeters.
+                </div>
+            `;
+            infoBoxes.appendChild(geneticBox);
+        }
+
+        // Display results
+        function displayResults(result) {
+            // Update height display
+            document.getElementById('currentHeightDisplay').textContent = `${result.current} cm`;
+            document.getElementById('predictedHeight').textContent = `${result.predicted} cm`;
+            document.getElementById('heightRange').textContent = `Range: ${result.min} - ${result.max} cm`;
+            document.getElementById('growthPotential').textContent = `+${result.growth} cm Growth Potential`;
+            
+            // Update scenario
+            document.getElementById('scenarioIcon').textContent = result.scenario.icon;
+            document.getElementById('scenarioTitle').textContent = result.scenario.name;
+            document.getElementById('scenarioDescription').textContent = result.scenario.description;
+            
+            // Add scenario tags
+            const tagsContainer = document.getElementById('scenarioTags');
+            result.scenario.tags.forEach(tag => {
+                const tagEl = document.createElement('span');
+                tagEl.className = 'scenario-tag';
+                tagEl.textContent = tag;
+                tagsContainer.appendChild(tagEl);
+            });
+            
+            // Update confidence meter
+            const confidenceCircle = document.getElementById('confidenceCircle');
+            const confidencePercent = document.getElementById('confidencePercent');
+            const circumference = 2 * Math.PI * 85;
+            const offset = circumference - (result.confidence / 100) * circumference;
+            
+            setTimeout(() => {
+                confidenceCircle.style.strokeDashoffset = offset;
+                confidencePercent.textContent = `${result.confidence}%`;
+            }, 500);
+            
+            // Create data summary
+            const dataSummary = document.getElementById('dataSummary');
+            const summaryData = [
+                { label: 'Current Age', value: `${userData.currentAge} years` },
+                { label: 'Puberty Started', value: `${userData.pubertyAge} years` },
+                { label: 'Body Type', value: userData.bodyType.charAt(0).toUpperCase() + userData.bodyType.slice(1) },
+                { label: 'Diet Type', value: userData.diet.charAt(0).toUpperCase() + userData.diet.slice(1) },
+                { label: 'Sleep Hours', value: userData.sleep },
+                { label: 'Family Average', value: `${result.familyAverage} cm` }
+            ];
+            
+            summaryData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'data-card';
+                card.innerHTML = `
+                    <div class="data-label">${item.label}</div>
+                    <div class="data-value">${item.value}</div>
+                `;
+                dataSummary.appendChild(card);
+            });
+            
+            // Create factor list
+            const factors = getFactorScores(userData, result.scenario);
+            const factorList = document.getElementById('factorList');
+            
+            factors.forEach(factor => {
+                const li = document.createElement('li');
+                li.className = 'factor-item';
+                li.innerHTML = `
+                    <div class="factor-header">
+                        <span class="factor-name">${factor.name}</span>
+                        <span class="factor-score">${factor.score}%</span>
+                    </div>
+                    <div class="factor-bar">
+                        <div class="factor-fill" style="width: 0%"></div>
+                    </div>
+                    <p style="margin-top: 10px; color: var(--text-secondary); font-size: 0.95rem;">${factor.description}</p>
+                `;
+                factorList.appendChild(li);
+                
+                // Animate fill
+                setTimeout(() => {
+                    li.querySelector('.factor-fill').style.width = `${factor.score}%`;
+                }, 100);
+            });
+            
+            // Create other sections
+            createAnalysisCards(userData, result);
+            createTimeline(userData, result);
+            createRecommendations(userData, result.scenario);
+            createInfoBoxes(userData, result);
+        }
+
+        // Initialize
+        window.onload = function() {
+            createParticles();
+            
+            // Get user data from localStorage
+            const storedData = localStorage.getItem('userData');
+            if (!storedData) {
+                alert('No user data found. Please complete the onboarding first.');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            userData = JSON.parse(storedData);
+            
+            // Loading sequence
+            const loadingMessages = [
+                { text: 'Analyzing your genetic data...', subtext: 'Processing family height patterns' },
+                { text: 'Calculating growth potential...', subtext: 'Evaluating puberty timeline and development' },
+                { text: 'Assessing lifestyle factors...', subtext: 'Analyzing nutrition, sleep, and body composition' },
+                { text: 'Building personalized model...', subtext: 'Creating your unique growth prediction' },
+                { text: 'Finalizing predictions...', subtext: 'Generating comprehensive analysis' }
+            ];
+            
+            let messageIndex = 0;
+            const loadingText = document.getElementById('loadingText');
+            const loadingSubtext = document.getElementById('loadingSubtext');
+            
+            const messageInterval = setInterval(() => {
+                if (messageIndex < loadingMessages.length) {
+                    loadingText.textContent = loadingMessages[messageIndex].text;
+                    loadingSubtext.textContent = loadingMessages[messageIndex].subtext;
+                    messageIndex++;
+                } else {
+                    clearInterval(messageInterval);
+                }
+            }, 1000);
+            
+            // Calculate prediction
+            setTimeout(() => {
+                predictionResult = calculateHeightPrediction(userData);
+                
+                // Show results
+                setTimeout(() => {
+                    document.getElementById('loadingContainer').classList.add('hidden');
+                    document.getElementById('resultsContainer').classList.add('active');
+                    displayResults(predictionResult);
+                }, 500);
+            }, 5500);
+        };
+    </script>
+</body>
+</html>

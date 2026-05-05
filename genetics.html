@@ -1,0 +1,2166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Tree Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #151932;
+            --bg-tertiary: #1e2139;
+            --accent-primary: #00d4ff;
+            --accent-secondary: #7b2cbf;
+            --accent-tertiary: #ff006e;
+            --text-primary: #ffffff;
+            --text-secondary: #b8c1ec;
+            --tallest-color: #00ff88;
+            --shortest-color: #ff4757;
+            --male-color: #4361ee;
+            --female-color: #f72585;
+            --glow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(0, 212, 255, 0.3),
+                            0 0 40px rgba(0, 212, 255, 0.2),
+                            inset 0 0 20px rgba(0, 212, 255, 0.1);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(0, 212, 255, 0.5),
+                            0 0 60px rgba(0, 212, 255, 0.3),
+                            inset 0 0 30px rgba(0, 212, 255, 0.2);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes rotateGradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        @keyframes drawLine {
+            from {
+                stroke-dashoffset: 1000;
+            }
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        @keyframes nodeAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1e2139 50%, #0a0e27 100%);
+            background-size: 400% 400%;
+            animation: rotateGradient 15s ease infinite;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(123, 44, 191, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(255, 0, 110, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeInUp 1s ease;
+        }
+
+        h1 {
+            font-size: 3.5em;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rotateGradient 5s ease infinite;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: var(--text-secondary);
+            margin-top: 10px;
+            animation: fadeInUp 1s ease 0.2s backwards;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease 0.4s backwards;
+        }
+
+        .tab-btn {
+            padding: 15px 40px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-primary);
+            color: var(--text-primary);
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .tab-btn:hover::before {
+            left: 100%;
+        }
+
+        .tab-btn:hover {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-color: var(--accent-secondary);
+            animation: glow 2s infinite;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 20px 0;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 0.6s ease backwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(0, 212, 255, 0.03) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        .form-section h2 {
+            color: var(--accent-primary);
+            margin-bottom: 30px;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .form-section h2::before {
+            content: '';
+            width: 5px;
+            height: 40px;
+            background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            position: relative;
+            animation: slideInLeft 0.6s ease backwards;
+        }
+
+        .form-group:nth-child(even) {
+            animation: slideInRight 0.6s ease backwards;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 15px 20px;
+            background: var(--bg-tertiary);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .height-input {
+            position: relative;
+        }
+
+        .height-input::after {
+            content: 'cm';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-weight: 600;
+            pointer-events: none;
+        }
+
+        .gender-select {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .gender-option {
+            flex: 1;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gender-option input {
+            display: none;
+        }
+
+        .gender-option:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-primary);
+        }
+
+        .gender-option input:checked + label {
+            background: linear-gradient(135deg, var(--male-color), var(--accent-primary));
+        }
+
+        .gender-option.female input:checked + label {
+            background: linear-gradient(135deg, var(--female-color), var(--accent-tertiary));
+        }
+
+        .gender-option label {
+            display: block;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn {
+            padding: 18px 50px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            border-radius: 50px;
+            color: var(--text-primary);
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(-2px);
+        }
+
+        .btn-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .add-more-btn {
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-tertiary));
+            padding: 12px 30px;
+            font-size: 1em;
+            margin-top: 20px;
+        }
+
+        .results-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 50px;
+            margin: 30px 0;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .result-card {
+            background: var(--bg-tertiary);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            border-left: 5px solid var(--accent-primary);
+            animation: slideInLeft 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        .result-card h3 {
+            color: var(--accent-primary);
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .result-value {
+            font-size: 3em;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-tertiary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 20px 0;
+            animation: pulse 2s infinite;
+        }
+
+        .result-details {
+            color: var(--text-secondary);
+            font-size: 1.1em;
+            line-height: 1.8;
+        }
+
+        .family-tree-container {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 30px 0;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .tree-wrapper {
+            min-width: 1200px;
+            position: relative;
+            padding: 50px;
+        }
+
+        .tree-node {
+            position: absolute;
+            background: var(--bg-tertiary);
+            border: 3px solid var(--accent-primary);
+            border-radius: 15px;
+            padding: 15px 20px;
+            min-width: 150px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: nodeAppear 0.6s ease backwards;
+        }
+
+        .tree-node:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.6);
+            z-index: 10;
+        }
+
+        .tree-node.male {
+            border-color: var(--male-color);
+            background: linear-gradient(135deg, var(--bg-tertiary), rgba(67, 97, 238, 0.1));
+        }
+
+        .tree-node.female {
+            border-color: var(--female-color);
+            background: linear-gradient(135deg, var(--bg-tertiary), rgba(247, 37, 133, 0.1));
+        }
+
+        .tree-node.tallest {
+            border-color: var(--tallest-color);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            animation: glow 2s infinite;
+        }
+
+        .tree-node.shortest {
+            border-color: var(--shortest-color);
+            box-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
+        }
+
+        .tree-node.user {
+            border-width: 4px;
+            border-color: var(--accent-tertiary);
+            box-shadow: 0 0 30px rgba(255, 0, 110, 0.6);
+            animation: pulse 2s infinite;
+        }
+
+        .node-name {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .node-height {
+            font-size: 1.3em;
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .node-relation {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tree-line {
+            position: absolute;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            height: 2px;
+            transform-origin: left center;
+            opacity: 0.6;
+            animation: drawLine 1s ease backwards;
+        }
+
+        .tree-line.vertical {
+            width: 2px;
+            height: auto;
+            background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+        }
+
+        .analysis-section {
+            background: var(--bg-tertiary);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .analysis-section h3 {
+            color: var(--accent-primary);
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .analysis-item {
+            background: var(--bg-secondary);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .analysis-item:hover {
+            transform: translateX(10px);
+            border-left-width: 8px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: var(--bg-tertiary);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.6s ease backwards;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.3);
+            border-color: var(--accent-primary);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: var(--bg-tertiary);
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .legend-item:hover {
+            transform: scale(1.05);
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 10px;
+            transition: width 1s ease;
+            animation: shimmer 2s infinite;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: var(--text-primary);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            border: 1px solid var(--accent-primary);
+        }
+
+        .genetic-pattern {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+        }
+
+        .genetic-pattern::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+            border-radius: 12px;
+            z-index: -1;
+        }
+
+        .pattern-title {
+            color: var(--accent-primary);
+            font-weight: 700;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .pattern-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(0, 212, 255, 0.2);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            animation: slideInRight 0.5s ease;
+        }
+
+        .alert-info {
+            background: rgba(0, 212, 255, 0.1);
+            border-left: 4px solid var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .alert-success {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 4px solid var(--tallest-color);
+            color: var(--tallest-color);
+        }
+
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            color: #ffc107;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+            }
+
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tree-wrapper {
+                min-width: 800px;
+            }
+        }
+
+        .percentage-indicator {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .percentage-high {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--tallest-color);
+        }
+
+        .percentage-medium {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--accent-primary);
+        }
+
+        .percentage-low {
+            background: rgba(255, 71, 87, 0.2);
+            color: var(--shortest-color);
+        }
+
+        .gene-carrier-badge {
+            display: inline-block;
+            padding: 8px 15px;
+            background: linear-gradient(135deg, var(--tallest-color), var(--accent-primary));
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: glow 2s infinite;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 100%;
+            gap: 10px;
+            padding: 20px 0;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            transition: all 0.5s ease;
+            animation: growBar 1s ease backwards;
+        }
+
+        @keyframes growBar {
+            from {
+                height: 0 !important;
+            }
+        }
+
+        .bar:hover {
+            filter: brightness(1.3);
+            transform: scaleY(1.05);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: 700;
+            color: var(--accent-primary);
+            font-size: 0.9em;
+        }
+
+        .prediction-range {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .range-slider {
+            position: relative;
+            height: 40px;
+            background: linear-gradient(90deg, var(--shortest-color), #ffc107, var(--tallest-color));
+            border-radius: 20px;
+            margin: 20px 0;
+        }
+
+        .range-marker {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 3px solid var(--accent-primary);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+            animation: pulse 2s infinite;
+        }
+
+        .range-label {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .family-insights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .insight-card {
+            background: var(--bg-tertiary);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .insight-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .insight-icon {
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .insight-title {
+            color: var(--accent-primary);
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .insight-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .additional-relatives {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px dashed rgba(0, 212, 255, 0.3);
+        }
+
+        .remove-btn {
+            background: rgba(255, 71, 87, 0.2);
+            color: var(--shortest-color);
+            padding: 8px 20px;
+            border: 2px solid var(--shortest-color);
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .remove-btn:hover {
+            background: var(--shortest-color);
+            color: var(--bg-primary);
+            transform: scale(1.05);
+        }
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .tree-svg-line {
+            stroke: var(--accent-primary);
+            stroke-width: 2;
+            fill: none;
+            opacity: 0.6;
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: drawLine 2s ease forwards;
+        }
+
+        .confidence-meter {
+            margin: 20px 0;
+        }
+
+        .confidence-bar {
+            height: 30px;
+            background: var(--bg-tertiary);
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-tertiary), var(--accent-primary), var(--tallest-color));
+            border-radius: 15px;
+            transition: width 1.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+        }
+
+        .data-quality-indicator {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .quality-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            transition: all 0.3s ease;
+        }
+
+        .quality-dot.active {
+            background: var(--tallest-color);
+            box-shadow: 0 0 10px var(--tallest-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <header>
+            <h1>Your Genetics Heritage</h1>
+            <p class="subtitle">Discover Your Genetic Height Potential Through Advanced Family Analysis</p>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('input')">📝 Input Data</button>
+            <button class="tab-btn" onclick="switchTab('tree')">🌳 Family Tree</button>
+            <button class="tab-btn" onclick="switchTab('analysis')">📊 Analysis</button>
+            <button class="tab-btn" onclick="switchTab('predictions')">🔮 Predictions</button>
+        </div>
+
+        <!-- Input Tab -->
+        <div id="inputTab" class="tab-content active">
+            <div class="form-section">
+                <h2>Personal Information</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Your Name</label>
+                        <input type="text" id="userName" placeholder="Enter your name">
+                    </div>
+                    <div class="form-group">
+                        <label>Your Age</label>
+                        <input type="number" id="userAge" placeholder="Enter your age" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Your Gender</label>
+                        <div class="gender-select">
+                            <div class="gender-option male">
+                                <input type="radio" name="userGender" value="male" id="genderMale" checked>
+                                <label for="genderMale">👨 Male</label>
+                            </div>
+                            <div class="gender-option female">
+                                <input type="radio" name="userGender" value="female" id="genderFemale">
+                                <label for="genderFemale">👩 Female</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Current Height</label>
+                        <div class="input-wrapper height-input">
+                            <input type="number" id="userHeight" placeholder="Enter height in cm" min="50" max="250" step="0.1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Parents</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Father's Height</label>
+                        <div class="input-wrapper height-input">
+                            <input type="number" id="fatherHeight" placeholder="Height in cm" min="50" max="250" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Mother's Height</label>
+                        <div class="input-wrapper height-input">
+                            <input type="number" id="motherHeight" placeholder="Height in cm" min="50" max="250" step="0.1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Grandparents</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Paternal Grandfather</label>
+                        <div class="input-wrapper height-input">
+                            <input type="number" id="paternalGrandfather" placeholder="Height in cm" min="50" max="250" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Paternal Grandmother</label>
+                        <div class="input-wrapper height-input">
+                            <input type="number" id="paternalGrandmother" placeholder="Height in cm" min="50" max="250" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Maternal Grandfather</label>
+                        <div class="input-wrapper height-input">
+                            <input type="number" id="maternalGrandfather" placeholder="Height in cm" min="50" max="250" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Maternal Grandmother</label>
+                        <div class="input-wrapper height-input">
+                            <input type="number" id="maternalGrandmother" placeholder="Height in cm" min="50" max="250" step="0.1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Extended Family</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Uncle 1 (Paternal)</label>
+                        <div class="input-wrapper height-input">
+                            <input type="number" id="uncle1" placeholder="Height in cm (optional)" min="50" max="250" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Uncle 2 (Paternal)</label>
+                        <div class="input-wrapper height-input">
+                            <input type="number" id="uncle2" placeholder="Height in cm (optional)" min="50" max="250" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Aunt 1 (Paternal)</label>
+                        <div class="input-wrapper height-input">
+                            <input type="number" id="aunt1" placeholder="Height in cm (optional)" min="50" max="250" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Aunt 2 (Maternal)</label>
+                        <div class="input-wrapper height-input">
+                            <input type="number" id="aunt2" placeholder="Height in cm (optional)" min="50" max="250" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Sibling 1</label>
+                        <div class="input-wrapper height-input">
+                            <input type="number" id="sibling1" placeholder="Height in cm (optional)" min="50" max="250" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Cousin 1</label>
+                        <div class="input-wrapper height-input">
+                            <input type="number" id="cousin1" placeholder="Height in cm (optional)" min="50" max="250" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Cousin 2</label>
+                        <div class="input-wrapper height-input">
+                            <input type="number" id="cousin2" placeholder="Height in cm (optional)" min="50" max="250" step="0.1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section additional-relatives">
+                <h2>Additional Relatives (Optional)</h2>
+                <div id="additionalRelativesContainer"></div>
+                <div class="btn-container">
+                    <button class="btn add-more-btn" onclick="addRelative()">➕ Add Another Relative</button>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn" onclick="calculateGenetics()">🧬 Calculate Genetic Height</button>
+            </div>
+        </div>
+
+        <!-- Family Tree Tab -->
+        <div id="treeTab" class="tab-content">
+            <div class="family-tree-container">
+                <h2 style="color: var(--accent-primary); text-align: center; margin-bottom: 30px;">
+                    🌳 Your Family Height Tree
+                </h2>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="color: var(--male-color);"></div>
+                        <span>Male</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="color: var(--female-color);"></div>
+                        <span>Female</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="color: var(--tallest-color);"></div>
+                        <span>Tallest</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="color: var(--shortest-color);"></div>
+                        <span>Shortest</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="color: var(--accent-tertiary);"></div>
+                        <span>You</span>
+                    </div>
+                </div>
+                <div id="familyTreeCanvas" class="tree-wrapper">
+                    <div class="alert alert-info">
+                        📊 Enter your family data and calculate to see your beautiful family tree visualization!
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Tab -->
+        <div id="analysisTab" class="tab-content">
+            <div id="analysisResults"></div>
+        </div>
+
+        <!-- Predictions Tab -->
+        <div id="predictionsTab" class="tab-content">
+            <div id="predictionResults"></div>
+        </div>
+    </div>
+
+    <script>
+        // Generate animated stars background
+        function generateStars() {
+            const starsContainer = document.getElementById('stars');
+            const numberOfStars = 150;
+            
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.opacity = Math.random() * 0.5 + 0.3;
+                starsContainer.appendChild(star);
+            }
+        }
+
+        generateStars();
+
+        // Tab switching
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const btns = document.querySelectorAll('.tab-btn');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            btns.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Additional relatives counter
+        let additionalRelativeCount = 0;
+
+        function addRelative() {
+            additionalRelativeCount++;
+            const container = document.getElementById('additionalRelativesContainer');
+            
+            const relativeDiv = document.createElement('div');
+            relativeDiv.className = 'form-grid';
+            relativeDiv.style.animation = 'fadeInUp 0.5s ease';
+            relativeDiv.innerHTML = `
+                <div class="form-group">
+                    <label>Relative ${additionalRelativeCount} Name</label>
+                    <input type="text" id="additionalName${additionalRelativeCount}" placeholder="Name (e.g., Great Uncle)">
+                </div>
+                <div class="form-group">
+                    <label>Relation</label>
+                    <select id="additionalRelation${additionalRelativeCount}">
+                        <option value="uncle">Uncle</option>
+                        <option value="aunt">Aunt</option>
+                        <option value="cousin">Cousin</option>
+                        <option value="sibling">Sibling</option>
+                        <option value="greatgrandparent">Great Grandparent</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="additionalGender${additionalRelativeCount}">
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Height</label>
+                    <div class="input-wrapper height-input">
+                        <input type="number" id="additionalHeight${additionalRelativeCount}" placeholder="Height in cm" min="50" max="250" step="0.1">
+                    </div>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <button class="remove-btn" onclick="removeRelative(this)">🗑️ Remove</button>
+                </div>
+            `;
+            
+            container.appendChild(relativeDiv);
+        }
+
+        function removeRelative(button) {
+            button.closest('.form-grid').remove();
+        }
+
+        // Main calculation function
+        function calculateGenetics() {
+            const data = collectData();
+            
+            if (!validateData(data)) {
+                alert('Please fill in at least your height and your parents\' heights!');
+                return;
+            }
+
+            // Save to localStorage
+            localStorage.setItem('geneticHeightData', JSON.stringify(data));
+
+            // Calculate genetic height
+            const results = calculateGeneticHeight(data);
+            
+            // Display results
+            displayFamilyTree(data, results);
+            displayAnalysis(data, results);
+            displayPredictions(data, results);
+
+            // Switch to tree tab
+            switchTab('tree');
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            document.querySelectorAll('.tab-btn')[0].classList.remove('active');
+        }
+
+        function collectData() {
+            const data = {
+                user: {
+                    name: document.getElementById('userName').value || 'You',
+                    age: parseFloat(document.getElementById('userAge').value) || 0,
+                    gender: document.querySelector('input[name="userGender"]:checked').value,
+                    height: parseFloat(document.getElementById('userHeight').value) || 0
+                },
+                family: []
+            };
+
+            // Parents
+            const fatherHeight = parseFloat(document.getElementById('fatherHeight').value);
+            const motherHeight = parseFloat(document.getElementById('motherHeight').value);
+            
+            if (fatherHeight) {
+                data.family.push({ name: 'Father', relation: 'father', gender: 'male', height: fatherHeight, generation: 1 });
+            }
+            if (motherHeight) {
+                data.family.push({ name: 'Mother', relation: 'mother', gender: 'female', height: motherHeight, generation: 1 });
+            }
+
+            // Grandparents
+            const grandparents = [
+                { id: 'paternalGrandfather', name: 'Paternal Grandfather', relation: 'grandfather', gender: 'male', generation: 2 },
+                { id: 'paternalGrandmother', name: 'Paternal Grandmother', relation: 'grandmother', gender: 'female', generation: 2 },
+                { id: 'maternalGrandfather', name: 'Maternal Grandfather', relation: 'grandfather', gender: 'male', generation: 2 },
+                { id: 'maternalGrandmother', name: 'Maternal Grandmother', relation: 'grandmother', gender: 'female', generation: 2 }
+            ];
+
+            grandparents.forEach(gp => {
+                const height = parseFloat(document.getElementById(gp.id).value);
+                if (height) {
+                    data.family.push({ ...gp, height });
+                }
+            });
+
+            // Extended family
+            const extended = [
+                { id: 'uncle1', name: 'Uncle 1', relation: 'uncle', gender: 'male', generation: 1 },
+                { id: 'uncle2', name: 'Uncle 2', relation: 'uncle', gender: 'male', generation: 1 },
+                { id: 'aunt1', name: 'Aunt 1', relation: 'aunt', gender: 'female', generation: 1 },
+                { id: 'aunt2', name: 'Aunt 2', relation: 'aunt', gender: 'female', generation: 1 },
+                { id: 'sibling1', name: 'Sibling', relation: 'sibling', gender: 'male', generation: 0 },
+                { id: 'cousin1', name: 'Cousin 1', relation: 'cousin', gender: 'male', generation: 0 },
+                { id: 'cousin2', name: 'Cousin 2', relation: 'cousin', gender: 'female', generation: 0 }
+            ];
+
+            extended.forEach(ext => {
+                const height = parseFloat(document.getElementById(ext.id).value);
+                if (height) {
+                    data.family.push({ ...ext, height });
+                }
+            });
+
+            // Additional relatives
+            for (let i = 1; i <= additionalRelativeCount; i++) {
+                const nameEl = document.getElementById(`additionalName${i}`);
+                const heightEl = document.getElementById(`additionalHeight${i}`);
+                
+                if (nameEl && heightEl) {
+                    const height = parseFloat(heightEl.value);
+                    const name = nameEl.value;
+                    const relation = document.getElementById(`additionalRelation${i}`).value;
+                    const gender = document.getElementById(`additionalGender${i}`).value;
+                    
+                    if (height && name) {
+                        data.family.push({
+                            name,
+                            relation,
+                            gender,
+                            height,
+                            generation: relation === 'greatgrandparent' ? 3 : (relation === 'sibling' || relation === 'cousin' ? 0 : 1)
+                        });
+                    }
+                }
+            }
+
+            return data;
+        }
+
+        function validateData(data) {
+            if (data.user.height === 0) return false;
+            const hasParent = data.family.some(f => f.relation === 'father' || f.relation === 'mother');
+            return hasParent;
+        }
+
+        function calculateGeneticHeight(data) {
+            const results = {
+                geneticHeight: 0,
+                predictedAdultHeight: 0,
+                sonHeight: 0,
+                daughterHeight: 0,
+                confidence: 0,
+                tallestPerson: null,
+                shortestPerson: null,
+                averageHeight: 0,
+                maleAverage: 0,
+                femaleAverage: 0,
+                patterns: [],
+                geneCarriers: []
+            };
+
+            // Mid-parental height method with adjustments
+            const father = data.family.find(f => f.relation === 'father');
+            const mother = data.family.find(f => f.relation === 'mother');
+
+            if (father && mother) {
+                if (data.user.gender === 'male') {
+                    results.geneticHeight = ((father.height + mother.height) / 2) + 6.5;
+                } else {
+                    results.geneticHeight = ((father.height + mother.height) / 2) - 6.5;
+                }
+            }
+
+            // Adjust based on grandparents
+            const grandparents = data.family.filter(f => f.generation === 2);
+            if (grandparents.length > 0) {
+                const avgGrandparentHeight = grandparents.reduce((sum, gp) => sum + gp.height, 0) / grandparents.length;
+                results.geneticHeight = (results.geneticHeight * 0.7) + (avgGrandparentHeight * 0.3);
+            }
+
+            // Factor in extended family
+            const extendedFamily = data.family.filter(f => f.generation === 1 && f.relation !== 'father' && f.relation !== 'mother');
+            if (extendedFamily.length > 0) {
+                const avgExtended = extendedFamily.reduce((sum, ext) => sum + ext.height, 0) / extendedFamily.length;
+                results.geneticHeight = (results.geneticHeight * 0.85) + (avgExtended * 0.15);
+            }
+
+            // Calculate predicted adult height if user is young
+            if (data.user.age < 21) {
+                const growthFactor = 1 + ((21 - data.user.age) * 0.02);
+                results.predictedAdultHeight = data.user.height * growthFactor;
+            } else {
+                results.predictedAdultHeight = data.user.height;
+            }
+
+            // Predict future children heights
+            results.sonHeight = results.geneticHeight + 6.5;
+            results.daughterHeight = results.geneticHeight - 6.5;
+
+            // Find tallest and shortest
+            const allPeople = [data.user, ...data.family];
+            results.tallestPerson = allPeople.reduce((max, p) => p.height > max.height ? p : max);
+            results.shortestPerson = allPeople.reduce((min, p) => p.height < min.height ? p : min);
+
+            // Calculate averages
+            results.averageHeight = allPeople.reduce((sum, p) => sum + p.height, 0) / allPeople.length;
+            
+            const males = allPeople.filter(p => p.gender === 'male');
+            const females = allPeople.filter(p => p.gender === 'female');
+            
+            if (males.length > 0) {
+                results.maleAverage = males.reduce((sum, p) => sum + p.height, 0) / males.length;
+            }
+            if (females.length > 0) {
+                results.femaleAverage = females.reduce((sum, p) => sum + p.height, 0) / females.length;
+            }
+
+            // Confidence calculation
+            results.confidence = Math.min(100, 50 + (data.family.length * 5));
+
+            // Identify patterns
+            results.patterns = identifyPatterns(data);
+
+            // Identify gene carriers
+            results.geneCarriers = identifyGeneCarriers(data, results);
+
+            return results;
+        }
+
+        function identifyPatterns(data) {
+            const patterns = [];
+            const family = [data.user, ...data.family];
+
+            // Pattern 1: Paternal vs Maternal height dominance
+            const paternalSide = family.filter(f => f.name.includes('Paternal') || f.relation === 'father');
+            const maternalSide = family.filter(f => f.name.includes('Maternal') || f.relation === 'mother');
+
+            if (paternalSide.length > 0 && maternalSide.length > 0) {
+                const paternalAvg = paternalSide.reduce((sum, p) => sum + p.height, 0) / paternalSide.length;
+                const maternalAvg = maternalSide.reduce((sum, p) => sum + p.height, 0) / maternalSide.length;
+                
+                if (Math.abs(paternalAvg - maternalAvg) > 5) {
+                    patterns.push({
+                        title: paternalAvg > maternalAvg ? 'Paternal Height Dominance' : 'Maternal Height Dominance',
+                        description: `The ${paternalAvg > maternalAvg ? 'paternal' : 'maternal'} side of your family shows stronger height genes, averaging ${Math.max(paternalAvg, maternalAvg).toFixed(1)} cm compared to ${Math.min(paternalAvg, maternalAvg).toFixed(1)} cm.`,
+                        icon: '📊'
+                    });
+                }
+            }
+
+            // Pattern 2: Gender-based height variance
+            const males = family.filter(p => p.gender === 'male');
+            const females = family.filter(p => p.gender === 'female');
+
+            if (males.length > 1 && females.length > 1) {
+                const maleVariance = calculateVariance(males.map(m => m.height));
+                const femaleVariance = calculateVariance(females.map(f => f.height));
+                
+                if (maleVariance > femaleVariance * 1.5) {
+                    patterns.push({
+                        title: 'High Male Height Variance',
+                        description: 'Males in your family show significant height variation, suggesting diverse genetic expression.',
+                        icon: '👨'
+                    });
+                } else if (femaleVariance > maleVariance * 1.5) {
+                    patterns.push({
+                        title: 'High Female Height Variance',
+                        description: 'Females in your family show significant height variation, indicating varied genetic factors.',
+                        icon: '👩'
+                    });
+                }
+            }
+
+            // Pattern 3: Generational trends
+            const gen0 = family.filter(f => f.generation === 0);
+            const gen1 = family.filter(f => f.generation === 1);
+            const gen2 = family.filter(f => f.generation === 2);
+
+            if (gen1.length > 0 && gen2.length > 0) {
+                const gen1Avg = gen1.reduce((sum, p) => sum + p.height, 0) / gen1.length;
+                const gen2Avg = gen2.reduce((sum, p) => sum + p.height, 0) / gen2.length;
+                
+                if (gen1Avg > gen2Avg + 3) {
+                    patterns.push({
+                        title: 'Positive Height Evolution',
+                        description: `Your parents' generation is taller than grandparents' by ${(gen1Avg - gen2Avg).toFixed(1)} cm on average, showing improved nutrition and health.`,
+                        icon: '📈'
+                    });
+                }
+            }
+
+            // Pattern 4: Tall gene clusters
+            const veryTall = family.filter(f => f.height > 180).length;
+            if (veryTall >= 3) {
+                patterns.push({
+                    title: 'Strong Tall Gene Cluster',
+                    description: `${veryTall} family members exceed 180 cm, indicating strong height genetics in your family line.`,
+                    icon: '🧬'
+                });
+            }
+
+            return patterns;
+        }
+
+        function calculateVariance(heights) {
+            const mean = heights.reduce((sum, h) => sum + h, 0) / heights.length;
+            const squaredDiffs = heights.map(h => Math.pow(h - mean, 2));
+            return squaredDiffs.reduce((sum, d) => sum + d, 0) / heights.length;
+        }
+
+        function identifyGeneCarriers(data, results) {
+            const carriers = [];
+            const threshold = results.averageHeight + 5;
+
+            data.family.forEach(member => {
+                if (member.height > threshold && member.generation >= 1) {
+                    carriers.push({
+                        name: member.name,
+                        height: member.height,
+                        contribution: ((member.height - results.averageHeight) / results.averageHeight * 100).toFixed(1)
+                    });
+                }
+            });
+
+            return carriers.sort((a, b) => b.height - a.height);
+        }
+
+        function displayFamilyTree(data, results) {
+            const canvas = document.getElementById('familyTreeCanvas');
+            canvas.innerHTML = '';
+
+            // Create SVG for connections
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.style.position = 'absolute';
+            svg.style.top = '0';
+            svg.style.left = '0';
+            svg.style.width = '100%';
+            svg.style.height = '100%';
+            svg.style.pointerEvents = 'none';
+            canvas.appendChild(svg);
+
+            const positions = {
+                // Generation 2 - Grandparents
+                paternalGrandfather: { x: 100, y: 50 },
+                paternalGrandmother: { x: 250, y: 50 },
+                maternalGrandfather: { x: 550, y: 50 },
+                maternalGrandmother: { x: 700, y: 50 },
+                
+                // Generation 1 - Parents and Extended
+                father: { x: 175, y: 180 },
+                mother: { x: 625, y: 180 },
+                uncle1: { x: 50, y: 180 },
+                uncle2: { x: 300, y: 180 },
+                aunt1: { x: 500, y: 180 },
+                aunt2: { x: 750, y: 180 },
+                
+                // Generation 0 - User and Siblings
+                user: { x: 400, y: 310 },
+                sibling1: { x: 250, y: 310 },
+                cousin1: { x: 100, y: 310 },
+                cousin2: { x: 700, y: 310 },
+
+                // Future generation
+                son: { x: 350, y: 440 },
+                daughter: { x: 450, y: 440 }
+            };
+
+            // Create user node
+            createNode(canvas, 'You', data.user.height, positions.user.x, positions.user.y, 
+                      data.user.gender, true, false, false, 'user');
+
+            // Create family nodes
+            data.family.forEach(member => {
+                const key = member.relation === 'father' ? 'father' :
+                           member.relation === 'mother' ? 'mother' :
+                           member.name.toLowerCase().replace(/\s+/g, '');
+                
+                let pos = positions[key];
+                if (!pos) {
+                    // Assign random position for additional relatives
+                    pos = { x: 50 + Math.random() * 700, y: 100 + member.generation * 130 };
+                }
+
+                const isTallest = member.height === results.tallestPerson.height && member.name === results.tallestPerson.name;
+                const isShortest = member.height === results.shortestPerson.height && member.name === results.shortestPerson.name;
+
+                createNode(canvas, member.name, member.height, pos.x, pos.y, 
+                          member.gender, false, isTallest, isShortest, member.relation);
+            });
+
+            // Create predicted children nodes
+            createNode(canvas, 'Future Son', results.sonHeight, positions.son.x, positions.son.y, 
+                      'male', false, false, false, 'predicted');
+            createNode(canvas, 'Future Daughter', results.daughterHeight, positions.daughter.x, positions.daughter.y, 
+                      'female', false, false, false, 'predicted');
+
+            // Draw connections
+            drawConnections(svg, positions, data);
+        }
+
+        function createNode(parent, name, height, x, y, gender, isUser, isTallest, isShortest, relation) {
+            const node = document.createElement('div');
+            node.className = `tree-node ${gender} ${isUser ? 'user' : ''} ${isTallest ? 'tallest' : ''} ${isShortest ? 'shortest' : ''}`;
+            node.style.left = x + 'px';
+            node.style.top = y + 'px';
+            node.style.animationDelay = (Math.random() * 0.5) + 's';
+
+            node.innerHTML = `
+                <div class="node-name">${name}</div>
+                <div class="node-height">${height.toFixed(1)} cm</div>
+                <div class="node-relation">${relation}</div>
+            `;
+
+            parent.appendChild(node);
+        }
+
+        function drawConnections(svg, positions, data) {
+            // Connect grandparents to parents
+            drawLine(svg, positions.paternalGrandfather, positions.father);
+            drawLine(svg, positions.paternalGrandmother, positions.father);
+            drawLine(svg, positions.maternalGrandfather, positions.mother);
+            drawLine(svg, positions.maternalGrandmother, positions.mother);
+
+            // Connect parents to user
+            drawLine(svg, positions.father, positions.user);
+            drawLine(svg, positions.mother, positions.user);
+
+            // Connect user to predicted children
+            drawLine(svg, positions.user, positions.son);
+            drawLine(svg, positions.user, positions.daughter);
+        }
+
+        function drawLine(svg, from, to) {
+            if (!from || !to) return;
+
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', from.x + 75);
+            line.setAttribute('y1', from.y + 50);
+            line.setAttribute('x2', to.x + 75);
+            line.setAttribute('y2', to.y);
+            line.setAttribute('class', 'tree-svg-line');
+            svg.appendChild(line);
+        }
+
+        function displayAnalysis(data, results) {
+            const container = document.getElementById('analysisResults');
+            
+            let html = `
+                <div class="results-section">
+                    <h2 style="color: var(--accent-primary); text-align: center; margin-bottom: 30px;">
+                        📊 Comprehensive Genetic Analysis
+                    </h2>
+
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Your Genetic Height</div>
+                            <div class="stat-value">${results.geneticHeight.toFixed(1)}</div>
+                            <div style="color: var(--text-secondary); margin-top: 10px;">cm</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Family Average</div>
+                            <div class="stat-value">${results.averageHeight.toFixed(1)}</div>
+                            <div style="color: var(--text-secondary); margin-top: 10px;">cm</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Male Average</div>
+                            <div class="stat-value">${results.maleAverage.toFixed(1)}</div>
+                            <div style="color: var(--text-secondary); margin-top: 10px;">cm</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Female Average</div>
+                            <div class="stat-value">${results.femaleAverage.toFixed(1)}</div>
+                            <div style="color: var(--text-secondary); margin-top: 10px;">cm</div>
+                        </div>
+                    </div>
+
+                    <div class="confidence-meter">
+                        <h3 style="color: var(--accent-primary); margin-bottom: 15px;">Prediction Confidence</h3>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: ${results.confidence}%">
+                                ${results.confidence.toFixed(0)}%
+                            </div>
+                        </div>
+                        <div class="data-quality-indicator" style="margin-top: 15px; justify-content: center; display: flex;">
+                            ${Array(5).fill(0).map((_, i) => 
+                                `<div class="quality-dot ${i < Math.ceil(results.confidence / 20) ? 'active' : ''}"></div>`
+                            ).join('')}
+                        </div>
+                    </div>
+
+                    <div class="result-card">
+                        <h3>🏆 Height Champions</h3>
+                        <div class="result-details">
+                            <p><strong>Tallest Family Member:</strong> ${results.tallestPerson.name} - ${results.tallestPerson.height.toFixed(1)} cm 
+                            <span class="gene-carrier-badge">Tall Gene Carrier</span></p>
+                            <p><strong>Shortest Family Member:</strong> ${results.shortestPerson.name} - ${results.shortestPerson.height.toFixed(1)} cm</p>
+                            <p><strong>Height Range:</strong> ${(results.tallestPerson.height - results.shortestPerson.height).toFixed(1)} cm difference</p>
+                        </div>
+                    </div>
+
+                    ${results.geneCarriers.length > 0 ? `
+                        <div class="analysis-section">
+                            <h3>🧬 Tall Gene Carriers Analysis</h3>
+                            ${results.geneCarriers.map(carrier => `
+                                <div class="analysis-item">
+                                    <strong>${carrier.name}</strong> - ${carrier.height.toFixed(1)} cm
+                                    <span class="percentage-indicator ${
+                                        parseFloat(carrier.contribution) > 10 ? 'percentage-high' :
+                                        parseFloat(carrier.contribution) > 5 ? 'percentage-medium' : 'percentage-low'
+                                    }">
+                                        +${carrier.contribution}% above average
+                                    </span>
+                                    <div class="progress-bar" style="margin-top: 10px;">
+                                        <div class="progress-fill" style="width: ${Math.min(100, carrier.contribution * 5)}%"></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+                    ${results.patterns.length > 0 ? `
+                        <div class="analysis-section">
+                            <h3>🔍 Genetic Patterns Detected</h3>
+                            ${results.patterns.map(pattern => `
+                                <div class="genetic-pattern">
+                                    <div class="pattern-title">${pattern.icon} ${pattern.title}</div>
+                                    <div class="pattern-description">${pattern.description}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+                    <div class="family-insights">
+                        <div class="insight-card">
+                            <div class="insight-icon">📈</div>
+                            <div class="insight-title">Growth Potential</div>
+                            <div class="insight-content">
+                                Based on your family genetics, ${
+                                    results.geneticHeight > data.user.height ? 
+                                    `you may still grow ${(results.geneticHeight - data.user.height).toFixed(1)} cm more` :
+                                    `you've reached your genetic potential`
+                                }
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-icon">👨‍👩‍👧‍👦</div>
+                            <div class="insight-title">Family Position</div>
+                            <div class="insight-content">
+                                You rank ${getRankInFamily(data, results)} among all family members in height
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-icon">🎯</div>
+                            <div class="insight-title">Genetic Accuracy</div>
+                            <div class="insight-content">
+                                Your current height is ${Math.abs(data.user.height - results.geneticHeight).toFixed(1)} cm ${
+                                    data.user.height > results.geneticHeight ? 'above' : 'below'
+                                } genetic prediction
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <h3 style="color: var(--accent-primary); text-align: center; margin-bottom: 20px;">
+                            Family Height Distribution
+                        </h3>
+                        ${createHeightChart(data, results)}
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function getRankInFamily(data, results) {
+            const allHeights = [data.user, ...data.family].map(p => p.height).sort((a, b) => b - a);
+            const rank = allHeights.indexOf(data.user.height) + 1;
+            const total = allHeights.length;
+            
+            const suffix = rank === 1 ? 'st' : rank === 2 ? 'nd' : rank === 3 ? 'rd' : 'th';
+            return `${rank}${suffix} out of ${total}`;
+        }
+
+        function createHeightChart(data, results) {
+            const family = [data.user, ...data.family].sort((a, b) => b.height - a.height);
+            const maxHeight = Math.max(...family.map(f => f.height));
+            
+            return `
+                <div class="bar-chart">
+                    ${family.map((member, index) => {
+                        const heightPercent = (member.height / maxHeight) * 100;
+                        return `
+                            <div class="bar" style="height: ${heightPercent}%; animation-delay: ${index * 0.1}s;">
+                                <div class="bar-value">${member.height.toFixed(0)}</div>
+                                <div class="bar-label">${member.name || 'You'}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function displayPredictions(data, results) {
+            const container = document.getElementById('predictionResults');
+            
+            let html = `
+                <div class="results-section">
+                    <h2 style="color: var(--accent-primary); text-align: center; margin-bottom: 30px;">
+                        🔮 Future Height Predictions
+                    </h2>
+
+                    ${data.user.age < 21 ? `
+                        <div class="result-card">
+                            <h3>Your Predicted Adult Height</h3>
+                            <div class="result-value">${results.predictedAdultHeight.toFixed(1)} cm</div>
+                            <div class="result-details">
+                                <p>Based on your current age (${data.user.age}) and family genetics, you may still grow approximately 
+                                <strong>${(results.predictedAdultHeight - data.user.height).toFixed(1)} cm</strong>.</p>
+                                <div class="prediction-range">
+                                    <div class="range-slider">
+                                        <div class="range-marker" style="left: ${(data.user.height / results.predictedAdultHeight) * 100}%"></div>
+                                    </div>
+                                    <div class="range-label">
+                                        Current: ${data.user.height.toFixed(1)} cm → Adult: ${results.predictedAdultHeight.toFixed(1)} cm
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Predicted Son's Height</div>
+                            <div class="stat-value">${results.sonHeight.toFixed(1)}</div>
+                            <div style="color: var(--text-secondary); margin-top: 10px;">cm</div>
+                            <div class="progress-bar" style="margin-top: 15px;">
+                                <div class="progress-fill" style="width: ${(results.sonHeight / 200) * 100}%"></div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Predicted Daughter's Height</div>
+                            <div class="stat-value">${results.daughterHeight.toFixed(1)}</div>
+                            <div style="color: var(--text-secondary); margin-top: 10px;">cm</div>
+                            <div class="progress-bar" style="margin-top: 15px;">
+                                <div class="progress-fill" style="width: ${(results.daughterHeight / 200) * 100}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="analysis-section">
+                        <h3>📊 Prediction Details</h3>
+                        <div class="analysis-item">
+                            <strong>Height Inheritance Pattern:</strong>
+                            <p>Your children will likely inherit a combination of genes from both parents. The predictions show expected heights 
+                            based on your family's genetic history. Boys typically grow ${results.sonHeight > results.geneticHeight ? 'taller' : 'similar to'} 
+                            the genetic baseline, while girls grow slightly shorter.</p>
+                        </div>
+                        <div class="analysis-item">
+                            <strong>Environmental Factors:</strong>
+                            <p>Remember that height is influenced by both genetics (60-80%) and environmental factors (20-40%) including nutrition, 
+                            sleep, exercise, and overall health during childhood and adolescence.</p>
+                        </div>
+                        <div class="analysis-item">
+                            <strong>Prediction Range:</strong>
+                            <p>Son's expected range: ${(results.sonHeight - 5).toFixed(1)} - ${(results.sonHeight + 5).toFixed(1)} cm</p>
+                            <p>Daughter's expected range: ${(results.daughterHeight - 5).toFixed(1)} - ${(results.daughterHeight + 5).toFixed(1)} cm</p>
+                        </div>
+                    </div>
+
+                    <div class="family-insights">
+                        <div class="insight-card">
+                            <div class="insight-icon">🧬</div>
+                            <div class="insight-title">Genetic Inheritance</div>
+                            <div class="insight-content">
+                                Your children will receive 50% of height genes from you and 50% from your partner. The stronger tall genes 
+                                from ${results.tallestPerson.name} (${results.tallestPerson.height.toFixed(1)} cm) may express in future generations.
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-icon">📈</div>
+                            <div class="insight-title">Generational Trend</div>
+                            <div class="insight-content">
+                                Each generation tends to be ${getGenerationalTrend(data, results)} due to improved nutrition and healthcare.
+                            </div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-icon">🎯</div>
+                            <div class="insight-title">Height Potential</div>
+                            <div class="insight-content">
+                                With ${results.confidence.toFixed(0)}% confidence, your children have strong potential to reach or exceed 
+                                their predicted heights with proper nutrition and care.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>💡 Note:</strong> These predictions are based on genetic calculations and family history. 
+                        Actual heights can vary based on numerous factors including nutrition, health, and lifestyle during development years.
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function getGenerationalTrend(data, results) {
+            const gen1 = data.family.filter(f => f.generation === 1);
+            const gen2 = data.family.filter(f => f.generation === 2);
+            
+            if (gen1.length > 0 && gen2.length > 0) {
+                const gen1Avg = gen1.reduce((sum, p) => sum + p.height, 0) / gen1.length;
+                const gen2Avg = gen2.reduce((sum, p) => sum + p.height, 0) / gen2.length;
+                
+                if (gen1Avg > gen2Avg) {
+                    return `${(gen1Avg - gen2Avg).toFixed(1)} cm taller`;
+                } else {
+                    return 'stable';
+                }
+            }
+            
+            return 'gradually increasing';
+        }
+
+        // Load saved data on page load
+        window.addEventListener('load', () => {
+            const savedData = localStorage.getItem('geneticHeightData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                // Populate form fields with saved data
+                document.getElementById('userName').value = data.user.name || '';
+                document.getElementById('userAge').value = data.user.age || '';
+                document.getElementById('userHeight').value = data.user.height || '';
+                
+                if (data.user.gender === 'female') {
+                    document.getElementById('genderFemale').checked = true;
+                }
+
+                // Populate family data
+                data.family.forEach(member => {
+                    const fieldMap = {
+                        'father': 'fatherHeight',
+                        'mother': 'motherHeight',
+                        'grandfather': member.name.includes('Paternal') ? 'paternalGrandfather' : 'maternalGrandfather',
+                        'grandmother': member.name.includes('Paternal') ? 'paternalGrandmother' : 'maternalGrandmother'
+                    };
+
+                    const fieldId = fieldMap[member.relation];
+                    if (fieldId) {
+                        const field = document.getElementById(fieldId);
+                        if (field) field.value = member.height;
+                    }
+                });
+            }
+        });
+
+        // Auto-save functionality
+        setInterval(() => {
+            const data = collectData();
+            if (data.user.height > 0) {
+                localStorage.setItem('geneticHeightData', JSON.stringify(data));
+            }
+        }, 30000); // Save every 30 seconds
+    </script>
+</body>
+</html>

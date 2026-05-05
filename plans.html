@@ -1,0 +1,2736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Growth Plan - GrowLabX</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #00ffff;
+            --secondary-color: #ff00ff;
+            --accent-color: #00ff88;
+            --warning-color: #ffa500;
+            --danger-color: #ff3366;
+            --success-color: #00ff88;
+            --dark-bg: #0a0a0f;
+            --darker-bg: #050508;
+            --card-bg: rgba(20, 20, 30, 0.8);
+            --text-color: #ffffff;
+            --text-secondary: #b0b0b0;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --neon-glow: 0 0 20px rgba(0, 255, 255, 0.5);
+            --neon-glow-strong: 0 0 40px rgba(0, 255, 255, 0.8);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-color);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Advanced 3D Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(45deg, #0a0a0f 0%, #1a0a2e 50%, #0a0a0f 100%);
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--primary-color);
+            animation: float 15s infinite ease-in-out;
+            opacity: 0.3;
+            filter: blur(2px);
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0) scale(1) translateZ(0);
+            }
+            25% {
+                transform: translateY(-100px) translateX(50px) scale(1.2) translateZ(50px);
+            }
+            50% {
+                transform: translateY(-50px) translateX(-50px) scale(0.8) translateZ(-50px);
+            }
+            75% {
+                transform: translateY(-150px) translateX(100px) scale(1.1) translateZ(100px);
+            }
+        }
+
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: gridMove 20s linear infinite;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes gridMove {
+            0% {
+                transform: perspective(500px) rotateX(60deg) translateY(0);
+            }
+            100% {
+                transform: perspective(500px) rotateX(60deg) translateY(50px);
+            }
+        }
+
+        /* 3D Floating Objects */
+        .floating-cube {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            transform-style: preserve-3d;
+            animation: floatingCube 20s infinite ease-in-out;
+            z-index: -1;
+        }
+
+        @keyframes floatingCube {
+            0%, 100% {
+                transform: translateY(0) rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+            }
+            25% {
+                transform: translateY(-200px) rotateX(90deg) rotateY(180deg) rotateZ(45deg);
+            }
+            50% {
+                transform: translateY(-100px) rotateX(180deg) rotateY(360deg) rotateZ(90deg);
+            }
+            75% {
+                transform: translateY(-300px) rotateX(270deg) rotateY(540deg) rotateZ(135deg);
+            }
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 5%;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        }
+
+        .nav-logo:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.6));
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            padding: 12px 30px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50px;
+            color: var(--dark-bg);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-btn:hover::before {
+            left: 100%;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.5);
+        }
+
+        .nav-btn.secondary {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid transparent;
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+
+        .spinner-ring:nth-child(2) {
+            border-top-color: var(--secondary-color);
+            animation-delay: 0.3s;
+            width: 80%;
+            height: 80%;
+            top: 10%;
+            left: 10%;
+        }
+
+        .spinner-ring:nth-child(3) {
+            border-top-color: var(--accent-color);
+            animation-delay: 0.6s;
+            width: 60%;
+            height: 60%;
+            top: 20%;
+            left: 20%;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(720deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            animation: pulse 1.5s ease-in-out infinite;
+            text-align: center;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* Error Screen */
+        .error-screen {
+            display: none;
+            min-height: 100vh;
+            padding: 120px 5% 80px;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .error-screen.active {
+            display: flex;
+        }
+
+        .error-icon {
+            font-size: 8rem;
+            margin-bottom: 30px;
+            animation: errorShake 0.5s ease-in-out;
+        }
+
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .error-title {
+            font-size: 3rem;
+            color: var(--danger-color);
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: none;
+            padding: 120px 5% 80px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .main-container.active {
+            display: block;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 80px;
+            position: relative;
+            padding: 60px 0;
+        }
+
+        .hero-title {
+            font-size: 4.5rem;
+            font-weight: 900;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGlow 3s ease-in-out infinite;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.5));
+            }
+            50% {
+                filter: drop-shadow(0 0 40px rgba(0, 255, 255, 0.8));
+            }
+        }
+
+        .hero-subtitle {
+            font-size: 1.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px 40px;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+            min-width: 200px;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-10px) rotateX(10deg) rotateY(10deg);
+            border-color: var(--primary-color);
+            box-shadow: 0 20px 60px rgba(0, 255, 255, 0.4);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-top: 10px;
+        }
+
+        /* Plan Overview Card */
+        .plan-overview {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 40px;
+            padding: 60px;
+            border: 3px solid rgba(0, 255, 255, 0.3);
+            margin-bottom: 60px;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: all 0.5s ease;
+        }
+
+        .plan-overview::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+            animation: shimmer 4s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        .plan-overview:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 80px rgba(0, 255, 255, 0.3);
+        }
+
+        .plan-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .plan-icon {
+            font-size: 5rem;
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+        }
+
+        .plan-title-section h1 {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .plan-title-section p {
+            font-size: 1.4rem;
+            color: var(--text-secondary);
+        }
+
+        .plan-description {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .plan-tags {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .plan-tag {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.2), rgba(255, 0, 255, 0.2));
+            border-radius: 50px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .plan-tag:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin: 80px 0 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .section-number {
+            font-size: 4rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-title-container h2 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .section-title-container p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+        }
+
+        /* Category Cards */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .category-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .category-card:hover::before {
+            opacity: 1;
+        }
+
+        .category-card:hover {
+            transform: translateY(-15px) rotateX(5deg) rotateY(5deg);
+            border-color: var(--primary-color);
+            box-shadow: 0 25px 70px rgba(0, 255, 255, 0.3);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .category-title {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .category-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        /* Item List */
+        .item-list {
+            list-style: none;
+        }
+
+        .item {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            border-left: 4px solid var(--accent-color);
+            transition: all 0.3s ease;
+        }
+
+        .item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(10px);
+            border-left-color: var(--primary-color);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .item-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .item-badge {
+            padding: 5px 15px;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 255, 255, 0.2));
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+        }
+
+        .item-dosage {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        .item-details {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .item-warning {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background: rgba(255, 163, 0, 0.1);
+            border-left: 3px solid var(--warning-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: var(--warning-color);
+        }
+
+        /* Advanced Protocol Cards */
+        .protocol-card {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.05), rgba(255, 0, 255, 0.05));
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 40px;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .protocol-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .protocol-card:hover::after {
+            left: 100%;
+        }
+
+        .protocol-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .protocol-number {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--dark-bg);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+        }
+
+        .protocol-title {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .protocol-content {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .protocol-steps {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .protocol-step {
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .protocol-step:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(10px);
+        }
+
+        .protocol-step strong {
+            color: var(--accent-color);
+        }
+
+        /* Timeline Card */
+        .timeline-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 50px;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            margin-bottom: 60px;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 40px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            box-shadow: 0 0 20px var(--primary-color);
+        }
+
+        .timeline-item {
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: 0;
+            margin-right: 50%;
+            padding-right: 50px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 50%;
+            padding-left: 50px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            border: 5px solid var(--dark-bg);
+            box-shadow: 0 0 30px var(--primary-color);
+            z-index: 10;
+            animation: dotPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes dotPulse {
+            0%, 100% {
+                box-shadow: 0 0 30px var(--primary-color);
+            }
+            50% {
+                box-shadow: 0 0 50px var(--primary-color);
+            }
+        }
+
+        .timeline-content {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.3);
+        }
+
+        .timeline-month {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .timeline-description {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Warning Boxes */
+        .warning-box {
+            background: rgba(255, 165, 0, 0.1);
+            border-left: 5px solid var(--warning-color);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .warning-box-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--warning-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .warning-box-text {
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .danger-box {
+            background: rgba(255, 51, 102, 0.1);
+            border-left: 5px solid var(--danger-color);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .danger-box-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--danger-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .success-box {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 5px solid var(--success-color);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .success-box-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--success-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .info-box {
+            background: rgba(0, 255, 255, 0.1);
+            border-left: 5px solid var(--primary-color);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .info-box-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Accordion */
+        .accordion {
+            margin-bottom: 20px;
+        }
+
+        .accordion-item {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-item:hover {
+            border-color: var(--primary-color);
+        }
+
+        .accordion-header {
+            padding: 25px 30px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .accordion-header:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .accordion-title {
+            font-size: 1.5rem;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .accordion-icon {
+            font-size: 2rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .accordion-toggle {
+            font-size: 2rem;
+            color: var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-item.active .accordion-toggle {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 5000px;
+        }
+
+        .accordion-body {
+            padding: 0 30px 30px;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* Progress Tracker */
+        .progress-tracker {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            margin-bottom: 60px;
+        }
+
+        .progress-item {
+            margin-bottom: 30px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .progress-name {
+            font-size: 1.3rem;
+            color: var(--text-color);
+        }
+
+        .progress-percentage {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 10px;
+            transition: width 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 0 20px var(--primary-color);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 80px 40px;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+            border-radius: 40px;
+            margin-top: 80px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.1), transparent);
+            animation: ctaPulse 8s infinite;
+        }
+
+        @keyframes ctaPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-text {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50px;
+            color: var(--dark-bg);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline::before {
+                left: 30px;
+            }
+
+            .timeline-item:nth-child(odd) .timeline-content,
+            .timeline-item:nth-child(even) .timeline-content {
+                margin-left: 70px;
+                margin-right: 0;
+                padding-left: 30px;
+                padding-right: 30px;
+            }
+
+            .timeline-dot {
+                left: 30px;
+            }
+
+            .section-number {
+                font-size: 2.5rem;
+            }
+
+            .section-title-container h2 {
+                font-size: 1.8rem;
+            }
+
+            .plan-overview {
+                padding: 40px 25px;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .stat-box {
+                width: 100%;
+            }
+        }
+
+        /* Loading Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* Scroll Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Data Summary */
+        .data-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-color);
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.3);
+        }
+
+        .summary-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Quick Tips Section */
+        .quick-tips {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.05), rgba(255, 0, 255, 0.05));
+            border-radius: 30px;
+            padding: 40px;
+            margin: 40px 0;
+            border: 2px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .quick-tips h3 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .tip-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid var(--accent-color);
+            transition: all 0.3s ease;
+        }
+
+        .tip-card:hover {
+            transform: translateX(10px);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .tip-title {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .tip-content {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Print Button */
+        .print-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50%;
+            color: var(--dark-bg);
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.4);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .print-btn:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.6);
+        }
+
+        @media print {
+            .header, .print-btn, .nav-buttons, .cta-section {
+                display: none !important;
+            }
+            
+            .main-container {
+                padding-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="grid-overlay"></div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+            <div class="spinner-ring"></div>
+        </div>
+        <div class="loading-text">Generating Your Personalized Growth Plan...</div>
+    </div>
+
+    <!-- Error Screen -->
+    <div class="error-screen" id="errorScreen">
+        <div class="error-icon">⚠️</div>
+        <h1 class="error-title">Data Not Found</h1>
+        <p class="error-message">
+            We couldn't find your assessment data. Please complete the height prediction assessment first to generate your personalized growth plan.
+        </p>
+        <a href="results.html" class="btn">Complete Assessment</a>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="nav-logo">GrowLabX</div>
+            <div class="nav-buttons">
+                <a href="results.html" class="nav-btn secondary">← View Results</a>
+                <a href="index.html" class="nav-btn">Home</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container" id="mainContainer">
+        <!-- Hero Section -->
+        <section class="hero-section fade-in">
+            <h1 class="hero-title" id="planTitle">Your Personalized Growth Plan</h1>
+            <p class="hero-subtitle" id="planSubtitle">Advanced optimization protocol tailored to your unique profile</p>
+            
+            <div class="hero-stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="potentialGrowth">0 cm</div>
+                    <div class="stat-label">Growth Potential</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="planDuration">12</div>
+                    <div class="stat-label">Months Protocol</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="confidenceLevel">0%</div>
+                    <div class="stat-label">Success Probability</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="currentHeight">0 cm</div>
+                    <div class="stat-label">Current Height</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Summary -->
+        <div class="data-summary">
+            <div class="summary-card">
+                <div class="summary-label">Your Age</div>
+                <div class="summary-value" id="ageDisplay">0 years</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Puberty Started</div>
+                <div class="summary-value" id="pubertyDisplay">0 years</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Body Type</div>
+                <div class="summary-value" id="bodyTypeDisplay">Normal</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">Sleep Hours</div>
+                <div class="summary-value" id="sleepDisplay">8-9</div>
+            </div>
+        </div>
+
+        <!-- Plan Overview -->
+        <section class="plan-overview reveal">
+            <div class="plan-header">
+                <div class="plan-icon" id="scenarioIcon">🚀</div>
+                <div class="plan-title-section">
+                    <h1 id="scenarioName">Growth Optimization Protocol</h1>
+                    <p id="scenarioType">Advanced Multi-Phase Strategy</p>
+                </div>
+            </div>
+            <p class="plan-description" id="scenarioDescription">
+                This comprehensive plan is specifically designed based on your age, genetic potential, development stage, and lifestyle factors.
+            </p>
+            <div class="plan-tags" id="planTags"></div>
+        </section>
+
+        <!-- Quick Tips -->
+        <div class="quick-tips">
+            <h3>💡 Quick Start Tips</h3>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-title">🌙 Sleep First</div>
+                    <div class="tip-content">Prioritize 8-10 hours of quality sleep. This is the #1 factor for growth hormone production.</div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-title">🥗 Protein Power</div>
+                    <div class="tip-content">Aim for 2g protein per kg bodyweight daily. Spread across 4-5 meals for optimal absorption.</div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-title">🏃 Daily Movement</div>
+                    <div class="tip-content">Incorporate stretching and hanging exercises every single day for spine decompression.</div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-title">📊 Track Progress</div>
+                    <div class="tip-content">Measure height every 2 weeks in the morning. Consistency in tracking = consistency in results.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Hormonal Optimization -->
+        <div class="section-header reveal">
+            <div class="section-number">01</div>
+            <div class="section-title-container">
+                <h2>Hormonal Optimization</h2>
+                <p>Advanced protocols for maximizing natural HGH and IGF-1 production</p>
+            </div>
+        </div>
+
+        <div class="category-grid" id="hormonalOptimization"></div>
+
+        <!-- Section 2: Nutritional Protocols -->
+        <div class="section-header reveal">
+            <div class="section-number">02</div>
+            <div class="section-title-container">
+                <h2>Advanced Nutritional Protocols</h2>
+                <p>Strategic nutrition for bone growth and tissue development</p>
+            </div>
+        </div>
+
+        <div class="category-grid" id="nutritionalProtocols"></div>
+
+        <!-- Section 3: Supplementation Stack -->
+        <div class="section-header reveal">
+            <div class="section-number">03</div>
+            <div class="section-title-container">
+                <h2>Comprehensive Supplementation Stack</h2>
+                <p>Evidence-based supplements for height optimization</p>
+            </div>
+        </div>
+
+        <div class="category-grid" id="supplementation"></div>
+
+        <!-- Section 4: Exercise & Physical Optimization -->
+        <div class="section-header reveal">
+            <div class="section-number">04</div>
+            <div class="section-title-container">
+                <h2>Exercise & Physical Optimization</h2>
+                <p>Targeted exercises for spine decompression and growth stimulation</p>
+            </div>
+        </div>
+
+        <div class="category-grid" id="exerciseProtocols"></div>
+
+        <!-- Section 5: Sleep Optimization -->
+        <div class="section-header reveal">
+            <div class="section-number">05</div>
+            <div class="section-title-container">
+                <h2>Sleep Optimization Protocol</h2>
+                <p>Maximizing growth hormone secretion during sleep</p>
+            </div>
+        </div>
+
+        <div class="category-grid" id="sleepOptimization"></div>
+
+        <!-- Section 6: Advanced Techniques -->
+        <div class="section-header reveal">
+            <div class="section-number">06</div>
+            <div class="section-title-container">
+                <h2>Advanced Growth Techniques</h2>
+                <p>Cutting-edge methods for height enhancement</p>
+            </div>
+        </div>
+
+        <div class="accordion" id="advancedTechniques"></div>
+
+        <!-- Section 7: Timeline & Tracking -->
+        <div class="section-header reveal">
+            <div class="section-number">07</div>
+            <div class="section-title-container">
+                <h2>12-Month Implementation Timeline</h2>
+                <p>Structured roadmap for maximum results</p>
+            </div>
+        </div>
+
+        <div class="timeline-card reveal">
+            <div class="timeline" id="implementationTimeline"></div>
+        </div>
+
+        <!-- Section 8: Progress Tracking -->
+        <div class="section-header reveal">
+            <div class="section-number">08</div>
+            <div class="section-title-container">
+                <h2>Progress Tracking Metrics</h2>
+                <p>Key indicators to monitor your growth journey</p>
+            </div>
+        </div>
+
+        <div class="progress-tracker reveal" id="progressTracking"></div>
+
+        <!-- Important Safety Warning -->
+        <div class="danger-box">
+            <div class="danger-box-title">⚠️ Critical Safety Information</div>
+            <div class="warning-box-text">
+                <strong>Medical Supervision Required:</strong> Any hormone-related interventions (HGH, aromatase inhibitors, peptides) MUST be supervised by a qualified endocrinologist. Self-administration can cause serious health complications including organ damage, hormonal imbalances, and permanent growth plate fusion.
+                <br><br>
+                <strong>Supplement Safety:</strong> Always consult with a healthcare provider before starting new supplements, especially if you have pre-existing conditions or take medications. Some supplements can interact with medications or cause adverse effects.
+                <br><br>
+                <strong>Realistic Expectations:</strong> Height is 80% genetic. These protocols optimize your genetic potential but cannot override your genetic blueprint. Focus on maximizing YOUR potential, not comparing to others.
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section reveal">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to Start Your Transformation?</h2>
+                <p class="cta-text">Follow this comprehensive plan consistently and track your progress every step of the way</p>
+                <a href="results.html" class="btn">View Your Results Again</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Button -->
+    <button class="print-btn" onclick="window.print()" title="Print Plan">🖨️</button>
+
+    <script>
+        // ==========================================
+        // COMPREHENSIVE GROWTH PLAN GENERATOR
+        // ==========================================
+
+  let userData = {};
+let predictionResult = {};
+let growthPlan = {};
+
+// **ADD THIS SECTION - Load data from localStorage**
+function loadDataFromStorage() {
+    const storedUserData = localStorage.getItem('heightPredictorData');
+    const storedPrediction = localStorage.getItem('heightPrediction');
+    
+    if (storedUserData) {
+        userData = JSON.parse(storedUserData);
+        console.log('Loaded user data:', userData);
+    } else {
+        console.error('No user data found in localStorage');
+        return false;
+    }
+    
+    if (storedPrediction) {
+        predictionResult = JSON.parse(storedPrediction);
+        console.log('Loaded prediction:', predictionResult);
+    } else {
+        console.error('No prediction data found in localStorage');
+        return false;
+    }
+    
+    return true;
+}
+
+// **CALL THIS WHEN PAGE LOADS**
+window.addEventListener('DOMContentLoaded', function() {
+    if (!loadDataFromStorage()) {
+        // Show error message if data not found
+        document.body.innerHTML = '<div style="text-align: center; padding: 50px; color: white;"><h2>Data Not Found</h2><p>Please complete the height prediction form first.</p><a href="index.html" style="color: #4CAF50;">Go Back</a></div>';
+        return;
+    }
+    
+    // If data loaded successfully, generate the growth plan
+    createParticles();
+    growthPlan = generateComprehensiveGrowthPlan(userData, predictionResult);
+    displayGrowthPlan(growthPlan); // Call whatever function displays your plan
+});
+
+        // Create background particles
+        function createParticles() {
+            const bg = document.querySelector('.animated-bg');
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = Math.random() * 6 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = Math.random() * 10 + 10 + 's';
+                bg.appendChild(particle);
+            }
+
+            // Create floating cubes
+            for (let i = 0; i < 5; i++) {
+                const cube = document.createElement('div');
+                cube.className = 'floating-cube';
+                cube.style.left = Math.random() * 100 + '%';
+                cube.style.top = Math.random() * 100 + '%';
+                cube.style.animationDelay = Math.random() * 20 + 's';
+                bg.appendChild(cube);
+            }
+        }
+
+        // ==========================================
+        // COMPREHENSIVE GROWTH PLAN GENERATION
+        // ==========================================
+        
+        function generateComprehensiveGrowthPlan(userData, predictionResult) {
+            console.log('Generating growth plan with data:', userData, predictionResult);
+            
+            const age = parseInt(userData.currentAge);
+            const currentHeight = parseInt(userData.currentHeight);
+            const pubertyAge = parseInt(userData.pubertyAge);
+            const scenario = predictionResult.scenario;
+            const diet = userData.diet || 'nonveg';
+            const sleep = userData.sleep || '8-9';
+            const bodyType = userData.bodyType || 'normal';
+            const bodyHair = userData.bodyHair || 'moderate';
+            const fatherHeight = parseInt(userData.fatherHeight);
+            const motherHeight = parseInt(userData.motherHeight);
+
+            const plan = {
+                scenario: scenario,
+                userData: userData,
+                prediction: predictionResult,
+                hormonal: [],
+                nutritional: [],
+                supplementation: [],
+                exercise: [],
+                sleep: [],
+                advanced: [],
+                timeline: [],
+                tracking: []
+            };
+
+            // ==========================================
+            // SECTION 1: HORMONAL OPTIMIZATION
+            // ==========================================
+            
+            plan.hormonal.push({
+                category: "Natural HGH Boosters",
+                icon: "💉",
+                description: "Natural methods to maximize growth hormone production without medical intervention",
+                items: [
+                    {
+                        name: "Intermittent Fasting Protocol",
+                        badge: "Core",
+                        dosage: "16:8 fasting window (8 PM - 12 PM next day)",
+                        details: "Fasting increases HGH by up to 500%. Skip breakfast, have your first meal at noon. This forces your body to produce more growth hormone naturally. During fasting window, only consume water, black coffee, or green tea (no calories). Break fast with high-protein meal.",
+                        warning: "Start gradually with 12:12, then progress to 16:8 over 2 weeks. Not recommended if underweight."
+                    },
+                    {
+                        name: "High-Intensity Interval Training (HIIT)",
+                        badge: "Essential",
+                        dosage: "20 minutes, 3x per week (Mon/Wed/Fri)",
+                        details: "HIIT triggers massive HGH release - up to 450% increase. Protocol: 30 seconds all-out effort (sprinting, cycling, or burpees), 90 seconds active recovery, repeat 8 times. Best done in fasted state (morning before first meal) for maximum HGH spike. Increases lactic acid which stimulates growth hormone.",
+                        warning: "Warm up 5 minutes before, cool down 5 minutes after. Build intensity gradually."
+                    },
+                    {
+                        name: "L-Arginine Supplementation",
+                        badge: "Supplement",
+                        dosage: "5-9g before sleep on empty stomach (3 hours after last meal)",
+                        details: "Arginine is an amino acid that dramatically increases HGH secretion during sleep - studies show 100-200% increase. Dosage by weight: 5g if under 70kg, 7g if 70-85kg, 9g if over 85kg. Take in powder form mixed with water. Works synergistically with sleep's natural HGH pulse.",
+                        warning: "May cause mild stomach discomfort initially. Start with 3g and increase gradually. Avoid if you have herpes virus (can trigger outbreaks)."
+                    },
+                    {
+                        name: "L-Ornithine Stack",
+                        badge: "Supplement",
+                        dosage: "2-6g before sleep with L-Arginine",
+                        details: "Ornithine synergizes with Arginine for even greater HGH production. Optimal stack: 6g Arginine + 2-3g Ornithine taken together 30 minutes before bed. This combination can increase HGH by 400% during sleep. Ornithine also reduces ammonia, improving recovery and sleep quality.",
+                        warning: "Total amino acid load should not exceed 10g before bed to avoid digestive issues."
+                    },
+                    {
+                        name: "GABA (Gamma-Aminobutyric Acid)",
+                        badge: "Advanced",
+                        dosage: "3-5g before sleep or pre-workout",
+                        details: "GABA is the main inhibitory neurotransmitter that directly stimulates HGH production. Taking 3g can increase HGH by 200%. Take either before bed for sleep-enhanced release, or 30 minutes pre-workout for exercise-enhanced release. Calms nervous system while boosting growth hormone.",
+                        warning: "May cause drowsiness. Don't operate vehicles within 2 hours of taking."
+                    }
+                ]
+            });
+
+            // Add medical interventions for younger individuals or late bloomers
+            if (age <= 18 && (scenario.type === 'lateBloomer' || scenario.type === 'youngOptimal')) {
+                plan.hormonal.push({
+                    category: "Medical Hormone Optimization (Requires Doctor)",
+                    icon: "🏥",
+                    description: "Advanced medical interventions requiring endocrinologist consultation and supervision",
+                    items: [
+                        {
+                            name: "Growth Hormone Deficiency Testing",
+                            badge: "Medical",
+                            dosage: "Blood test + Growth plate X-ray",
+                            details: "First step: Get IGF-1 blood test (measures growth hormone activity). Normal range: 250-850 ng/mL for teenagers. If IGF-1 < 250, you may have HGH deficiency warranting treatment. Also get growth plate X-ray (hand/wrist) to confirm plates are still open. If both tests indicate potential, consult pediatric endocrinologist about HGH therapy. Can add 5-10cm if truly deficient.",
+                            warning: "⚠️ CRITICAL: Only pursue if medically necessary. Insurance typically covers only true deficiency. Cost: $10,000-30,000 per year without insurance."
+                        },
+                        {
+                            name: "Aromatase Inhibitor Protocol",
+                            badge: "Medical",
+                            dosage: "Letrozole 2.5mg every 48 hours OR Anastrozole 0.5-1mg daily",
+                            details: "Aromatase enzyme converts testosterone to estrogen. Estrogen causes growth plate fusion (closing). By blocking this conversion, you delay fusion by 1-2 years, extending growth window. Best for early bloomers (puberty < 12) or those with rapidly closing plates. Typical protocol: Letrozole 2.5mg every other day for 12-24 months. MUST monitor: (1) Estrogen levels monthly (keep E2 at 15-25 pg/mL, NOT lower), (2) Bone density scan every 6 months, (3) Growth plate X-rays every 3-4 months. Can add 3-7cm total.",
+                            warning: "⚠️ SEVERE: Too low estrogen causes: bone pain, joint problems, brittle bones, possible long-term fertility issues. ONLY under strict medical supervision. Not available over-counter."
+                        },
+                        {
+                            name: "MK-677 (Ibutamoren)",
+                            badge: "Research",
+                            dosage: "12.5-25mg before sleep",
+                            details: "MK-677 is a growth hormone secretagogue (stimulates natural HGH production). Not a SARM, doesn't affect hormones directly. Legal as research compound. Increases HGH by 60-100% and IGF-1 by 40-50%. Start with 12.5mg for 2 weeks, increase to 25mg if tolerated. Take before bed to align with natural HGH pulse. Cycle: 3-4 months on, 1 month off. Studies show can add 2-4cm in individuals with open growth plates. Also improves sleep quality, appetite, and recovery.",
+                            warning: "⚠️ Side effects: Increased appetite (can gain fat if not careful), water retention (1-2kg temporary), elevated blood sugar (monitor if diabetic), increased hunger. Not recommended if diabetic or pre-diabetic."
+                        }
+                    ]
+                });
+            }
+
+            // ==========================================
+            // SECTION 2: NUTRITIONAL PROTOCOLS
+            // ==========================================
+            
+            plan.nutritional.push({
+                category: "Protein Optimization",
+                icon: "🥩",
+                description: "High-protein intake for tissue growth, bone development, and IGF-1 production",
+                items: [
+                    {
+                        name: "Daily Protein Target",
+                        badge: "Core",
+                        dosage: "2.0-2.5g per kg bodyweight spread across 4-5 meals",
+                        details: `Calculate your need: If you weigh 60kg, aim for 120-150g protein daily. Spread intake: Meal 1 (30g), Meal 2 (30g), Meal 3 (30g), Meal 4 (30g), Meal 5 (30g). Best sources ranked: (1) Eggs (6-8 daily) - complete protein, (2) Chicken breast, (3) Fish (salmon, tuna), (4) Greek yogurt (400g = 20g protein), (5) Paneer/Cottage cheese, (6) Lentils + Rice (complete when combined). Protein is the literal building block of bone matrix, cartilage, and muscle tissue. Insufficient protein = stunted growth regardless of other factors.`,
+                        warning: "Stay well-hydrated (3-4L water daily) with high protein intake to prevent kidney strain."
+                    },
+                    {
+                        name: "Collagen Peptides",
+                        badge: "Essential",
+                        dosage: "15-20g daily in morning (hydrolyzed form)",
+                        details: "Collagen is the primary structural protein in bones, making up 90% of bone matrix. Type 1 collagen specifically. Hydrolyzed collagen peptides provide glycine, proline, and hydroxyproline - the exact amino acids your body uses to build bone and cartilage. Take 15g mixed in smoothie, juice, or coffee. Studies show 15g daily increases bone mineral density and may stimulate growth plate activity. Also improves joint health, skin, hair. Take WITH Vitamin C (200mg minimum) for optimal synthesis.",
+                        warning: "Choose hydrolyzed/peptide form for best absorption. Gelatin powder is cheaper but less bioavailable."
+                    },
+                    {
+                        name: "Essential Amino Acids (EAAs)",
+                        badge: "Supplement",
+                        dosage: "10g between meals, 2-3x daily",
+                        details: "EAAs trigger muscle protein synthesis and bone formation. Unlike protein powder, pure EAAs are absorbed in 20 minutes (protein takes 2-3 hours). Take 10g at 10 AM, 3 PM, and optionally 7 PM between meals. Look for formula with high leucine content (3-4g per serving). Leucine is the trigger for mTOR pathway (growth signaling). Keeps you in anabolic (building) state 16+ hours daily. Particularly important for vegetarians/vegans who may lack complete proteins.",
+                        warning: "Different from BCAAs - you need ALL 9 essential amino acids (leucine, isoleucine, valine, lysine, methionine, phenylalanine, threonine, tryptophan, histidine)."
+                    }
+                ]
+            });
+
+            plan.nutritional.push({
+                category: "Bone-Building Minerals",
+                icon: "🦴",
+                description: "Critical minerals for bone growth, density, and proper skeletal development",
+                items: [
+                    {
+                        name: "Calcium Strategy",
+                        badge: "Core",
+                        dosage: "1500-2000mg daily in divided doses (500mg maximum per dose)",
+                        details: "99% of body calcium is in bones. Your body can only absorb ~500mg at once, so split doses: 500mg breakfast, 500mg lunch, 500mg dinner. Best food sources: Milk (300mg per cup), Greek yogurt (400mg per cup), cheese (200mg per slice), sardines with bones (350mg per can), calcium-set tofu (400mg per serving), fortified plant milk. Calcium is literally what makes bones hard. During growth, you need MORE calcium than adults because bones are actively lengthening AND thickening.",
+                        warning: "CRITICAL: Must take with Vitamin D3 (for absorption) and K2 (for proper deposition into bones, not arteries). Calcium alone without these cofactors is useless or even harmful."
+                    },
+                    {
+                        name: "Magnesium Glycinate",
+                        badge: "Essential",
+                        dosage: "400-600mg before sleep",
+                        details: "Magnesium is required for: (1) Converting Vitamin D to active form, (2) Calcium metabolism and bone incorporation, (3) Over 300 enzymatic reactions. Deficiency causes growth retardation EVEN with adequate calcium. Glycinate form: best absorption, doesn't cause diarrhea (unlike citrate/oxide). Take 400-600mg at night - also improves deep sleep which boosts HGH. Food sources: Pumpkin seeds (150mg per oz), almonds (80mg per oz), dark chocolate (64mg per oz), spinach (157mg per cup).",
+                        warning: "Start with 200mg and increase gradually to avoid loose stools. Take 2+ hours away from calcium for optimal absorption."
+                    },
+                    {
+                        name: "Zinc Picolinate",
+                        badge: "Essential",
+                        dosage: "30-50mg daily with food",
+                        details: "Zinc is crucial for: (1) IGF-1 production (growth factor), (2) Growth plate function, (3) Testosterone production, (4) HGH synthesis. Deficiency severely stunts growth - studies show zinc-deficient children 10-15cm shorter. Picolinate form has best absorption (20% better than sulfate). Take 30-50mg with breakfast. Boosts testosterone by 30%, which converts to growth factors. Food sources: Oysters (74mg per 3oz - highest), red meat (7mg per 3oz), pumpkin seeds (2mg per oz), chickpeas (2.5mg per cup).",
+                        warning: "MUST take with 2mg copper to prevent copper deficiency. Ratio: 15:1 zinc to copper. Most zinc supplements include copper."
+                    },
+                    {
+                        name: "Boron",
+                        badge: "Advanced",
+                        dosage: "9-12mg daily (3mg with each main meal)",
+                        details: "Boron: (1) Increases free testosterone by 28% (study), (2) Reduces estrogen (prevents growth plate closure), (3) Improves calcium and magnesium absorption by 20%, (4) Strengthens bones, (5) Increases DHEA (hormone precursor). Take 3mg with breakfast, lunch, dinner (total 9mg). May add 1-2cm by optimizing bone mineralization and hormone balance. Found in: Prunes (2mg per 100g), raisins (2.5mg per 100g), avocados (2mg each), nuts.",
+                        warning: "Don't exceed 20mg daily. Higher doses can cause nausea."
+                    }
+                ]
+            });
+
+            plan.nutritional.push({
+                category: "Vitamin Optimization",
+                icon: "☀️",
+                description: "Essential vitamins for growth hormone production, bone formation, and calcium metabolism",
+                items: [
+                    {
+                        name: "Vitamin D3 (Cholecalciferol)",
+                        badge: "Critical",
+                        dosage: "5000-10000 IU daily with fatty meal",
+                        details: "Vitamin D is actually a HORMONE, not vitamin. Controls 200+ genes including growth genes. Critical for: (1) Calcium absorption (without D3, you only absorb 10-15% of calcium), (2) Bone growth and remodeling, (3) Growth plate function. Dosage: 5000 IU if you get sun exposure, 10000 IU if always indoors. Take in morning with fatty meal (needs fat for absorption). Also get 30 minutes sun exposure daily (10 AM - 3 PM) without sunscreen for natural production. Optimal blood level: 60-80 ng/mL (most people are 20-30 ng/mL = deficient).",
+                        warning: "MUST monitor blood levels every 3 months. Get 25-OH Vitamin D test. Too high (>100 ng/mL) can cause calcium deposits. MUST take with Vitamin K2."
+                    },
+                    {
+                        name: "Vitamin K2 (MK-7 form)",
+                        badge: "Critical",
+                        dosage: "200-400mcg daily with fatty meal",
+                        details: "K2 is REQUIRED if taking high-dose D3 and calcium. Function: Activates osteocalcin protein that BINDS calcium to bone matrix. Without K2, calcium deposits in arteries (atherosclerosis) instead of bones. Two forms: MK-4 (short half-life) and MK-7 (lasts 72 hours - superior). Take 200-400mcg MK-7 with fatty meal. May add 1-2cm by optimizing bone mineralization. Prevents 'Calcium Paradox' - osteoporosis AND arterial calcification.",
+                        warning: "NON-NEGOTIABLE if taking high-dose D3 (5000+ IU) and calcium (1500+ mg). Protects cardiovascular system."
+                    },
+                    {
+                        name: "Vitamin C",
+                        badge: "Essential",
+                        dosage: "1000-2000mg daily in divided doses (500mg per dose)",
+                        details: "Vitamin C is REQUIRED for collagen synthesis - the 'limiting factor' for bone formation. Without adequate C, your body CANNOT make collagen, so bones cannot form properly regardless of other nutrients. Take 500mg with breakfast, lunch, dinner. Enhances iron absorption (important for oxygen transport to growing tissues). Best forms: Liposomal Vitamin C (best absorption) or Ester-C (gentle on stomach). Food sources: 1 orange (70mg), bell peppers (150mg), strawberries (100mg per cup), broccoli (80mg per cup).",
+                        warning: "Doses above 2000mg may cause diarrhea. Spread throughout day for best absorption."
+                    },
+                    {
+                        name: "Vitamin A (Retinol)",
+                        badge: "Important",
+                        dosage: "10000 IU daily with fat",
+                        details: "Vitamin A regulates bone growth - both formation and preventing excessive resorption (breakdown). Critical for growth plate function and proper skeletal development. Take PREFORMED retinol (not beta-carotene which converts poorly). Take 10000 IU with fatty meal. Food sources: Beef liver (highest - 25000 IU per 3oz, limit once weekly), egg yolks (250 IU per yolk), butter (350 IU per tbsp), cod liver oil (1350 IU per tsp).",
+                        warning: "Don't exceed 25000 IU daily long-term - can be toxic (headaches, liver damage). 10000 IU is safe long-term."
+                    }
+                ]
+            });
+
+            // Add diet-specific optimizations
+            if (diet === 'vegan' || diet === 'vegetarian') {
+                plan.nutritional.push({
+                    category: "Plant-Based Optimization Stack",
+                    icon: "🌱",
+                    description: "Critical supplements for vegetarian/vegan diets to prevent deficiency-related growth stunting",
+                    items: [
+                        {
+                            name: "Vitamin B12 (Methylcobalamin)",
+                            badge: "Critical",
+                            dosage: "1000mcg daily sublingual (under tongue)",
+                            details: "B12 deficiency SEVERELY impairs growth - can stunt growth by 10-20%. NOT available in plant foods (except fortified). Methylcobalamin is active form (superior to cyanocobalamin). Let dissolve under tongue for direct absorption into bloodstream. Deficiency symptoms: fatigue, poor growth, weakness, tingling. Check B12 levels every 6 months - target >500 pg/mL (optimal 600-1000). Deficiency causes PERMANENT nerve damage if prolonged.",
+                            warning: "NON-NEGOTIABLE for vegetarians/vegans. Deficiency takes 2-4 years to manifest but damage is irreversible."
+                        },
+                        {
+                            name: "Iron Bisglycinate",
+                            badge: "Critical",
+                            dosage: "25-50mg daily with 500mg Vitamin C",
+                            details: "Plant iron (non-heme) is only 2-10% absorbed vs animal iron (heme) at 15-35%. Iron is crucial for oxygen transport to growing tissues. Bisglycinate form: 3x better absorbed than ferrous sulfate, doesn't cause constipation/nausea. Take with 500mg Vitamin C to TRIPLE absorption. Get ferritin tested (iron storage) - should be >50 ng/mL for optimal growth (most vegetarians <30). Low iron = fatigue, poor growth, developmental delays.",
+                            warning: "Don't take with tea, coffee, or calcium - blocks absorption completely. Take 2+ hours away from these."
+                        },
+                        {
+                            name: "Algal DHA/EPA Omega-3",
+                            badge: "Essential",
+                            dosage: "300mg DHA + 150mg EPA daily with fat",
+                            details: "Plant omega-3 (ALA from flax/chia) converts to DHA at only 0.5-5% (terrible). Need preformed DHA/EPA. Algal source (what fish get it from) provides 300mg DHA + 150mg EPA per capsule. Critical for: (1) Brain development, (2) Hormone production (including growth hormones), (3) Inflammation reduction, (4) HGH production. Take with fatty meal for absorption.",
+                            warning: "Flax/chia omega-3 is NOT sufficient - conversion to DHA is too poor. Must be algal DHA/EPA."
+                        },
+                        {
+                            name: "Plant Protein Powder",
+                            badge: "Essential",
+                            dosage: "30-50g per shake, 1-2x daily",
+                            details: "Blend of pea + rice protein provides complete amino acid profile (each alone is incomplete). Use to hit 2g protein per kg bodyweight. Mix with: banana, berries, spinach, flax seeds, nut butter, oat milk. Take post-workout and/or as meal replacement. Calculate: If 60kg, need 120g protein. 3 meals (20g each) + 2 shakes (30g each) = 120g total.",
+                            warning: "Choose brands tested for heavy metals (lead, arsenic, cadmium). Look for: Orgain, Vega, or Garden of Life."
+                        },
+                        {
+                            name: "L-Lysine",
+                            badge: "Important",
+                            dosage: "1000-2000mg twice daily (with meals)",
+                            details: "Plant proteins are LOW in lysine (limiting amino acid for growth). Grains/legumes have 20-40% less lysine than animal proteins. Lysine is critical for: (1) Collagen production, (2) Calcium absorption, (3) Growth hormone production. Supplementing ensures complete protein utilization. Take 1000mg breakfast and 1000mg dinner. Without adequate lysine, other amino acids cannot be used for growth.",
+                            warning: "Especially important if diet is mostly grains and legumes. Less critical if eating quinoa, soy, hemp (higher lysine)."
+                        },
+                        {
+                            name: "Creatine Monohydrate",
+                            badge: "Beneficial",
+                            dosage: "5g daily, anytime (with water)",
+                            details: "Vegetarians have 20-30% lower creatine stores (only in meat). Supplementing 5g daily: (1) Increases IGF-1 by 20%, (2) May add 0.5-1cm by increasing intracellular water in growth plates, (3) Improves exercise performance, (4) Boosts cognition. Loading phase: 20g daily for 5 days, then 5g maintenance. Mix in water or juice. Completely safe - most studied supplement in existence.",
+                            warning: "Drink 4-5L water daily when taking creatine. Causes 1-2kg water weight gain (temporary, intracellular)."
+                        }
+                    ]
+                });
+            }
+
+            // ==========================================
+            // SECTION 3: SUPPLEMENTATION STACK
+            // ==========================================
+            
+            plan.supplementation.push({
+                category: "Core Supplement Stack",
+                icon: "💊",
+                description: "Essential supplements that provide significant growth benefits when combined with nutrition",
+                items: [
+                    {
+                        name: "Ashwagandha KSM-66",
+                        badge: "Essential",
+                        dosage: "600mg twice daily (morning and night)",
+                        details: "Ashwagandha: (1) Reduces cortisol by 28% (cortisol INHIBITS growth), (2) Increases testosterone by 15% (converts to growth factors), (3) Improves sleep quality by 42%, (4) Enhances HGH response to exercise by 40%. KSM-66 is patented extract with most research. Take 600mg with breakfast and 600mg before bed. Effects build over 4-8 weeks. Stress/cortisol is major growth inhibitor - ashwagandha is potent cortisol reducer.",
+                        warning: "Takes 4-6 weeks to see full effects. Don't expect immediate results. Safe for long-term use."
+                    },
+                    {
+                        name: "Glucosamine + Chondroitin + MSM Stack",
+                        badge: "Important",
+                        dosage: "1500mg glucosamine, 1200mg chondroitin, 1000mg MSM daily",
+                        details: "This stack supports cartilage health in growth plates and provides building blocks for bone/connective tissue. Glucosamine: substrate for cartilage production. Chondroitin: maintains cartilage structure. MSM: sulfur for collagen cross-linking, reduces inflammation. Take all together with breakfast. Studies show may add 0.5-1cm by improving growth plate function and extending activity period. Also protects joints from exercise stress.",
+                        warning: "Choose pharmaceutical grade for purity. Some cheap brands contain minimal active ingredients."
+                    },
+                    {
+                        name: "SAM-e (S-Adenosyl Methionine)",
+                        badge: "Advanced",
+                        dosage: "400-800mg on empty stomach (200mg morning, 200mg afternoon)",
+                        details: "SAM-e: (1) Supports bone formation and cartilage production, (2) Provides methyl groups for DNA synthesis (critical during growth), (3) Improves mood and reduces depression, (4) Supports joint health. Take 200-400mg morning on empty stomach, 200-400mg afternoon on empty stomach. May enhance growth plate activity by providing methylation substrates. Also potent antidepressant (reduces stress = less cortisol = more growth).",
+                        warning: "Start with 200mg - can cause nausea if taken with food. Expensive supplement ($30-50/month)."
+                    },
+                    {
+                        name: "Taurine",
+                        badge: "Beneficial",
+                        dosage: "1000-2000mg twice daily",
+                        details: "Taurine: (1) Improves calcium utilization in bones, (2) Supports insulin function (IGF-1 signaling), (3) Enhances HGH response, (4) Protects growth plates from oxidative stress. Take 1-2g with breakfast and dinner. Found in meat/fish (vegetarians often deficient). May improve bone mineral density and growth plate longevity.",
+                        warning: "Very safe. Found naturally in energy drinks but better to supplement pure form."
+                    }
+                ]
+            });
+
+            // Add specialized supplements for younger individuals
+            if (age <= 16) {
+                plan.supplementation.push({
+                    category: "Youth Growth Enhancement Stack",
+                    icon: "🧬",
+                    description: "Advanced supplements specifically beneficial during peak growth years (under 18)",
+                    items: [
+                        {
+                            name: "Melatonin (Extended Release)",
+                            badge: "Important",
+                            dosage: "1-3mg, 30 minutes before bed",
+                            details: "Melatonin doesn't just help sleep - it DIRECTLY stimulates HGH release during sleep. Studies show 1-3mg increases HGH by 100-150%. Time-release formula keeps melatonin elevated all night (matches natural curve). Start with 1mg for 1 week, increase to 2mg week 2, then 3mg week 3 if needed. Improves sleep quality which is WHEN growth happens. Most teens are melatonin deficient due to screens/late sleep.",
+                            warning: "Take every night for best results. Your body doesn't become 'dependent' - this is a myth. Safe for long-term use in teens."
+                        },
+                        {
+                            name: "Glycine",
+                            badge: "Advanced",
+                            dosage: "3-5g, 1 hour before bed",
+                            details: "Glycine: (1) Lowers core body temperature (triggers deep sleep), (2) Increases deep sleep by 20% (where HGH is released), (3) Collagen building block, (4) Improves sleep quality dramatically. Mix 5g powder in water or tea 1 hour before bed. Tastes sweet. Enhances HGH release during sleep by improving sleep architecture. Collagen is 33% glycine, but pure glycine acts faster for sleep.",
+                            warning: "Can cause slight stomach discomfort. Take with small snack if needed. Very safe."
+                        },
+                        {
+                            name: "Zinc + Magnesium + B6 (ZMA)",
+                            badge: "Important",
+                            dosage: "30mg zinc, 450mg magnesium, 10mg B6 before bed",
+                            details: "ZMA combination: (1) Increases testosterone by 30%, (2) Improves sleep quality, (3) Boosts HGH, (4) Enhances recovery. Take 30-60 minutes before bed on empty stomach (2 hours after last meal). Synergistic combination - together more effective than separate. Particularly important for athletes who lose zinc/magnesium through sweat. Low zinc/magnesium = poor sleep = low HGH = reduced growth.",
+                            warning: "Take on empty stomach for best absorption. Don't take with calcium (competes)."
+                        }
+                    ]
+                });
+            }
+
+            // ==========================================
+            // SECTION 4: EXERCISE PROTOCOLS
+            // ==========================================
+            
+            plan.exercise.push({
+                category: "Height-Specific Exercises",
+                icon: "🏃",
+                description: "Exercises proven to decompress spine, stimulate growth plates, and maximize height potential",
+                items: [
+                    {
+                        name: "Dead Hanging (Pull-up Bar)",
+                        badge: "Core",
+                        dosage: "3 sets to failure, twice daily (morning + evening)",
+                        details: "Hang from pull-up bar with straight arms, let gravity decompress spine. Morning routine: Immediately after waking (spine is compressed from sleeping), do 3 sets of maximum hang time (goal: 30-60 seconds each). Evening routine: Before bed, 3 sets again. This decompresses vertebral discs, can add 2-5cm TEMPORARILY (disappears during day), 1-2cm PERMANENTLY over months by increasing disc spacing. Also strengthens grip and lats. Work up to 2+ minute single hang.",
+                        warning: "Use lifting straps or gloves if grip fails before time. Don't jerk or swing - slow controlled hanging."
+                    },
+                    {
+                        name: "Swimming (Breaststroke/Freestyle)",
+                        badge: "Essential",
+                        dosage: "45-60 minutes, 4-5x per week",
+                        details: "Swimming is THE #1 sport for height. Breaststroke specifically lengthens spine with each stroke. Horizontal position removes gravitational compression on spine (you're literally 'weightless'). Stretches body end-to-end repeatedly. Minimum 45 minutes per session, 4-5x weekly. Studies show competitive swimmers grow 3-5cm beyond genetic potential. Also full-body exercise, low-impact, builds lean muscle. If no pool access, substitute with yoga/Pilates focusing on lengthening poses.",
+                        warning: "MUST be consistent - minimum 4x per week for results. Single weekly session won't help."
+                    },
+                    {
+                        name: "Basketball/Volleyball (Jumping Sports)",
+                        badge: "Essential",
+                        dosage: "60 minutes, 3-4x per week",
+                        details: "Jumping sports stimulate bone growth through repeated impact. Each jump creates ground reaction force that travels up legs into spine, signaling bones to grow STRONGER and potentially LONGER through adaptive response. Jump as high as possible 50-100 times per session (touch rim/net if possible). Best: Basketball, volleyball, jump rope. Stimulates growth plates through mechanical stress. Many basketball players exceed family height potential by 3-8cm.",
+                        warning: "Land properly - ball of foot first, knees slightly bent, NEVER locked. Poor landing technique = knee injuries."
+                    },
+                    {
+                        name: "Cobra Stretch (Spine Extension)",
+                        badge: "Core",
+                        dosage: "3 sets of 30-60 seconds, twice daily",
+                        details: "Lie face down, place hands under shoulders, push upper body up keeping hips on ground, arch spine backward as far as comfortable. Hold 30-60 seconds, feel stretch in entire spine. Decompresses lumbar spine (lower back), improves posture, creates space between vertebrae. Do every morning after waking and every evening before bed. Can add 0.5-1cm permanently by improving vertebral spacing and posture. Also strengthens back muscles.",
+                        warning: "Should feel stretch, NOT sharp pain. If sharp pain, reduce depth. Breathe deeply throughout."
+                    },
+                    {
+                        name: "Cat-Cow Stretch (Spinal Mobility)",
+                        badge: "Core",
+                        dosage: "3 sets of 20 reps, twice daily",
+                        details: "On hands and knees: Cow (arch back down, look up), Cat (arch back up, tuck chin). Alternate slowly. Moves synovial fluid between spinal discs (nutrients in, waste out). Enhances spinal flexibility and disc health. Do 20 reps (10 cycles) slowly, 5 seconds per position. Improves spine mobility which is critical for disc spacing. Morning and evening routine. Helps maintain decompression from hanging.",
+                        warning: "Move SLOWLY. 5 seconds cow, 5 seconds cat. Fast = ineffective. Deep breathing throughout."
+                    },
+                    {
+                        name: "Yoga Downward Dog",
+                        badge: "Important",
+                        dosage: "Hold 60-90 seconds, 3x daily",
+                        details: "Hands and feet on ground, hips high (inverted V shape). Lengthens entire posterior chain (calves, hamstrings, back, arms). Decompresses spine through inversion. Hold 60-90 seconds, breathe deeply. Stretches entire body, improves posture. Works synergistically with hanging and cobra. Do morning, midday, evening for cumulative spinal decompression effect.",
+                        warning: "Keep arms straight, push hips up and back. Heels reaching toward ground (okay if don't touch)."
+                    }
+                ]
+            });
+
+            plan.exercise.push({
+                category: "Advanced Growth Stimulation",
+                icon: "💪",
+                description: "Advanced techniques for those serious about maximizing every millimeter of potential",
+                items: [
+                    {
+                        name: "Plyometric Jump Training",
+                        badge: "Advanced",
+                        dosage: "4 sets of 10 max-effort jumps, 3x per week (Mon/Wed/Fri)",
+                        details: "Explosive movements trigger MAXIMUM HGH release (450% increase) and bone remodeling through high-impact forces. Protocol: Box jumps (jump onto 20-30\" platform), depth jumps (step off box, land, immediately jump as high as possible), jump squats (squat down, explode up). Do 10 reps max effort, rest 2 minutes, repeat 4 sets. Do on Mon/Wed/Fri. Combined with nutrition, signals body to grow bones stronger/longer. Olympic athletes use plyometrics + nutrition for bone adaptation.",
+                        warning: "Requires good form. Land softly (ball of foot, knees bent). High injury risk if poor form. Not recommended if existing knee issues."
+                    },
+                    {
+                        name: "Inversion Table Therapy",
+                        badge: "Advanced",
+                        dosage: "10-15 minutes at 60-90° angle, twice daily",
+                        details: "Hang upside down on inversion table at 60-90 degree angle. POWERFUL spinal decompression - gravity pulls spine apart (opposite of standing). Can add 1-2 inches TEMPORARILY (lasts 4-8 hours), 0.5-1 inch PERMANENTLY over months. Start at 60 degrees for 5 minutes, build up to 90 degrees for 15 minutes over 2-3 weeks. Blood flows to brain (cognitive boost), gravity provides traction. Best after waking and before bed. Tables cost $150-400 but highly effective.",
+                        warning: "⚠️ NOT for people with: high blood pressure, glaucoma, heart conditions, hiatal hernia, or pregnancy. Consult doctor first."
+                    },
+                    {
+                        name: "Resistance Band Leg Stretching",
+                        badge: "Advanced",
+                        dosage: "10 minutes per leg, daily",
+                        details: "Lie on back, loop resistance band around one foot, pull leg toward chest while keeping straight. Provides TRACTION to hip joint and knee. Hold each position 30-60 seconds. Creates micro-spacing in leg bones (femur, tibia). Anecdotal reports of 0.5-1cm gains in leg length. Also improves hamstring flexibility dramatically. Increase resistance over weeks. Particularly effective ages 14-18 when growth plates most active.",
+                        warning: "Don't jerk or bounce. Slow, sustained stretches only. Should feel stretch, not pain."
+                    },
+                    {
+                        name: "Ankle Weights Walking",
+                        badge: "Experimental",
+                        dosage: "20-30 minutes daily with 2-5 kg per ankle",
+                        details: "Wear ankle weights during walking creates microfractures in leg bones (tibia, fibula, femur) that heal stronger and potentially LONGER through Wolff's Law (bone adapts to loads). Theory: body adapts to increased load by growing bones. Controversial but anecdotal reports of 1-2cm gains over 6-12 months. Start with 1kg per ankle for 2 weeks, increase 0.5kg every 2 weeks up to 5kg maximum. Walk normal pace, let extra weight create adaptive stress. ONLY for young individuals with open growth plates.",
+                        warning: "⚠️ High knee injury risk if too heavy too soon. Start LIGHT (1kg). Increase SLOWLY (0.5kg per 2 weeks). Stop if knee pain."
+                    }
+                ]
+            });
+
+            // ==========================================
+            // SECTION 5: SLEEP OPTIMIZATION
+            // ==========================================
+            
+            plan.sleep.push({
+                category: "Sleep Environment & Habits",
+                icon: "😴",
+                description: "Optimizing sleep for maximum HGH production - growth literally happens during sleep",
+                items: [
+                    {
+                        name: "Sleep Schedule (10 PM - 7 AM)",
+                        badge: "Critical",
+                        dosage: "9-10 hours, consistent time every night (including weekends)",
+                        details: "HGH pulses in waves during deep sleep. 80% of growth hormone released during sleep, especially 11 PM - 2 AM (first deep sleep cycle). MUST get 9-10 hours as teenager. Go to bed 10 PM, wake 7 AM. Consistency matters MORE than duration - same time every day, including weekends (±30 minutes maximum). Each hour of sleep BEFORE midnight counts as 2 hours (deeper, more restorative). Sleeping 2 AM - 12 PM does NOT equal 10 PM - 8 AM. Circadian biology: deepest sleep and highest HGH between 11 PM - 2 AM.",
+                        warning: "Growth is LITERALLY IMPOSSIBLE without adequate sleep. This is non-negotiable. Most important factor after genetics."
+                    },
+                    {
+                        name: "Room Environment",
+                        badge: "Critical",
+                        dosage: "Cool (60-67°F), pitch black, quiet",
+                        details: "Temperature: 60-67°F (15-19°C) triggers deep sleep and brown fat activation. Body MUST cool down to enter deep sleep (where HGH released). Darkness: Pitch black - cover ALL LEDs with black tape, blackout curtains, no phone screens. Even TINY light disrupts melatonin production (melatonin triggers HGH). Tape over: alarm clock, TV, power strips, smoke detector, door cracks. Noise: White noise machine if needed (blocks intermittent sounds). Optimal: 65°F, 0 lumens light, 40-50% humidity.",
+                        warning: "Light exposure at night reduces HGH by 50%. Phone screen light = 50-200 lumens. Cover or remove ALL light sources."
+                    },
+                    {
+                        name: "Pre-Sleep Routine (8-10 PM)",
+                        badge: "Important",
+                        dosage: "2-hour wind-down before bed",
+                        details: "8:00 PM: Last meal (small, avoid caffeine), 8:30 PM: Dim lights (50% brightness or orange bulbs), 9:00 PM: No screens (blue light suppresses melatonin by 50%), read book instead, 9:30 PM: Take sleep stack (melatonin, magnesium, glycine), hot shower (body temp drop after = sleep trigger), 10:00 PM: In bed, lights off, no phone. Consistent routine trains circadian rhythm. Body learns 'bed time' signal.",
+                        warning: "Blue light from screens suppresses melatonin. If MUST use device, wear blue-light blocking glasses after 8 PM."
+                    },
+                    {
+                        name: "Mattress & Pillow Optimization",
+                        badge: "Important",
+                        dosage: "Medium-firm mattress, supportive pillow, sleep on back",
+                        details: "Mattress: Medium-firm (supports spine alignment). Too soft = spine curves, compresses discs. Too hard = pressure points, poor circulation. Pillow: Should keep neck neutral (not bent up or down). Sleep position: BACK is best (spine straight, full decompression). Side is okay if pillow between knees. AVOID stomach sleeping (compresses spine, twists neck). Quality sleep surface = better sleep quality = more HGH. Replace mattress every 7-10 years, pillow every 2 years.",
+                        warning: "Poor sleep posture can compress spine 1-2cm overnight, negating hanging/stretching benefits."
+                    }
+                ]
+            });
+
+            plan.sleep.push({
+                category: "Sleep Enhancement Stack",
+                icon: "💤",
+                description: "Supplements to maximize sleep quality, deep sleep phases, and HGH release",
+                items: [
+                    {
+                        name: "Melatonin (Extended Release)",
+                        badge: "Essential",
+                        dosage: "1-3mg, 30 minutes before bed (start 1mg)",
+                        details: "Melatonin: (1) Triggers sleep onset, (2) DIRECTLY stimulates HGH release (100-150% increase), (3) Improves sleep quality. Time-release formula keeps levels elevated all night (mimics natural curve). Start 1mg for 1 week, increase to 2mg if needed, max 3mg. Take 30 minutes before target sleep time. Contrary to myth, body does NOT become 'dependent' - safe for daily use. Most effective sleep supplement for HGH production.",
+                        warning: "Take every night at same time for best results. Start low (1mg) - some people are very sensitive."
+                    },
+                    {
+                        name: "Magnesium Glycinate + Threonate",
+                        badge: "Essential",
+                        dosage: "400mg glycinate + 200mg threonate, 1 hour before bed",
+                        details: "Magnesium: (1) Relaxes muscles and nervous system (GABA activation), (2) Required for melatonin production, (3) Improves deep sleep by 20%, (4) Required for Vitamin D activation. Glycinate: best absorption, relaxation. Threonate: crosses blood-brain barrier, cognitive benefits. This combination dramatically improves deep sleep phases (where 70% of HGH released). Most people deficient in magnesium (90% of diets insufficient).",
+                        warning: "Start 200mg, increase to 400mg over 2 weeks. Too much too fast = loose stools. Take 2+ hours from calcium."
+                    },
+                    {
+                        name: "L-Theanine",
+                        badge: "Beneficial",
+                        dosage: "200-400mg, 30 minutes before bed",
+                        details: "L-Theanine (from green tea): (1) Increases alpha brain waves (relaxation without sedation), (2) Reduces anxiety and racing thoughts, (3) Improves sleep quality, (4) Enhances GABA, serotonin, dopamine. Take 200-400mg 30 minutes before bed. Helps 'turn off brain' for people who can't stop thinking at night. Synergizes with melatonin and magnesium. Safe, non-habit forming, no morning grogginess.",
+                        warning: "Very safe. Can be taken nightly long-term. No side effects for most people."
+                    },
+                    {
+                        name: "GABA (Gamma-Aminobutyric Acid)",
+                        badge: "Advanced",
+                        dosage: "500-750mg, 1 hour before bed",
+                        details: "GABA: main inhibitory neurotransmitter. (1) Calms nervous system, (2) Improves sleep quality, (3) DIRECTLY stimulates HGH production (200% increase), (4) Reduces anxiety. Take 500-750mg 1 hour before bed. Debate about crossing blood-brain barrier, but studies show effects (may work via gut-brain axis or peripheral receptors). Increases slow-wave sleep (deep sleep where HGH released). Synergizes with L-Theanine.",
+                        warning: "May cause drowsiness next day initially (first 1-2 weeks). Start low (500mg), increase if needed."
+                    },
+                    {
+                        name: "Tart Cherry Juice",
+                        badge: "Natural",
+                        dosage: "8 oz pure juice, 1 hour before bed",
+                        details: "Tart cherries: one of few natural melatonin sources. Also contain tryptophan (serotonin/melatonin precursor). Drink 8 oz pure tart cherry juice (NOT cocktail with added sugar) at 9 PM. Studies show: increases sleep time by 84 minutes, improves quality, raises melatonin levels naturally. Also anti-inflammatory (reduces muscle soreness from exercise). Natural, food-based approach.",
+                        warning: "Choose pure juice, not concentrate with added sugar. Can add 100-200 calories. Montmorency cherry variety best."
+                    },
+                    {
+                        name: "Apigenin",
+                        badge: "Advanced",
+                        dosage: "50mg, 30 minutes before bed",
+                        details: "Apigenin: flavonoid from chamomile. (1) Reduces anxiety (binds benzodiazepine receptors naturally), (2) Improves sleep onset (fall asleep faster), (3) Enhances sleep quality, (4) Non-habit forming. Take 50mg extract 30 minutes before bed. Pairs well with melatonin and L-Theanine. Provides gentle sleep promotion without grogginess. Safer than prescription sleep meds.",
+                        warning: "Don't combine with alcohol or prescription sedatives. Very safe otherwise."
+                    }
+                ]
+            });
+
+            // ==========================================
+            // SECTION 6: ADVANCED TECHNIQUES
+            // ==========================================
+            
+            plan.advanced.push({
+                title: "Hardmaxxing Protocols",
+                icon: "⚡",
+                content: "Advanced, aggressive methods for those serious about maximizing height. These are cutting-edge techniques that require dedication and sometimes medical supervision. Results vary but can add significant height when combined properly.",
+                steps: [
+                    {
+                        name: "Limb Lengthening Surgery",
+                        details: "The ONLY guaranteed method to add significant height after growth plates close. Two methods: (1) LON (Lengthening Over Nails) - external fixator + internal rod, (2) PRECICE - fully internal magnetic rod (superior, less risk). Procedure: Surgeon cuts bone (osteotomy), installs device, bone slowly separated 1mm per day (distraction), new bone fills gap (consolidation). Can add 5-8cm per segment (femur OR tibia, not both simultaneously). Total potential: 8cm femur + 5cm tibia = 13cm over 2 surgeries. Cost: $75,000-$150,000 USD (varies by country). Recovery: 6-12 months per segment, physical therapy intensive. Risks: infection (5-10%), nerve damage (rare), non-union (bone doesn't heal), muscle contracture, chronic pain. ONLY consider if: (1) Over 21 with closed plates confirmed, (2) Have realistic expectations, (3) Can afford TOP surgeon (don't go cheap), (4) Accept 6-18 month disability period, (5) Understand permanent lifestyle changes (athletic ability reduced). Countries: Turkey ($20k-40k), India ($15k-30k), USA ($75k-150k), Russia ($30k-50k)."
+                    },
+                    {
+                        name: "Research Peptide Stack",
+                        details: "Research peptides that stimulate growth (NOT FDA approved for this use). Stack: (1) <strong>CJC-1295 DAC</strong> (Drug Affinity Complex): Long-acting GHRH analog. Raises baseline HGH levels. Dosage: 2mg subcutaneous injection once weekly. Half-life: 8 days. (2) <strong>Ipamorelin</strong>: Growth hormone secretagogue. Dosage: 200-300mcg injected 3x daily (morning, post-workout, before bed). Mimics ghrelin, triggers HGH pulses. (3) <strong>BPC-157</strong> (Body Protection Compound): Healing peptide. Dosage: 250-500mcg subcutaneous 2x daily. Accelerates healing of growth plates, bones, tendons. (4) <strong>TB-500</strong> (Thymosin Beta-4): Systemic healing peptide. Dosage: 2-5mg subcutaneous twice weekly. Promotes cell migration, angiogenesis, healing. Stack protocol: Run all four together for synergy. Cycle: 3 months on, 1 month off, repeat. Storage: Refrigerate (bacteriostatic water). Administration: Subcutaneous injection (insulin needle, stomach fat). Potential: 2-4cm IF growth plates still open or partially open. More effective under age 21. Legal status: Gray area - legal to buy for 'research' but not FDA approved for human use. Sources: Research chemical suppliers. Cost: $200-400/month. Monitoring: Get IGF-1 blood test monthly to confirm working."
+                    },
+                    {
+                        name: "Hyperloading Protocol",
+                        details: "Extreme physical stimulus to force bone adaptation through Wolff's Law (bone adapts to loads placed on it). <strong>Phase 1 - Adaptation (Weeks 1-4)</strong>: Wear 10kg weighted vest ALL DAY (remove only for sleep/shower). Body adapts by strengthening bones and potentially lengthening to handle load. <strong>Phase 2 - Intensification (Weeks 5-8)</strong>: Increase to 15kg vest + ankle weights (2kg each ankle). Walk 30 minutes 2x daily with weights. <strong>Phase 3 - Deload (Weeks 9-12)</strong>: Remove ALL weights suddenly. Theory: bones grew slightly to handle load, retain length after removal. <strong>Phase 4 - Maintenance (Weeks 13-16)</strong>: Return to 10kg vest to maintain gains. Anecdotal reports: 0.5-1.5cm gains over 4 months. Requires: (1) Perfect nutrition - 3g protein/kg, 2000mg calcium daily, (2) Adequate sleep - 9+ hours nightly, (3) Young age - works best under 18. Mechanism: Constant loading signals osteoblasts (bone-building cells) to increase activity. Works BEST if growth plates still open. Risks: Joint pain, back strain if poor form. Use proper posture, core engagement."
+                    },
+                    {
+                        name: "Professional Spinal Decompression",
+                        details: "Professional chiropractic and massage therapy for spinal alignment and decompression. <strong>Treatment protocol</strong>: (1) <strong>Chiropractic adjustment</strong> 2x weekly: Corrects vertebral subluxations (misalignments), creates proper spacing between vertebrae. Methods: Diversified technique (manual), Activator (instrument-assisted), Drop table. (2) <strong>Deep tissue massage</strong> 1x weekly: Releases muscle tension in back/neck that compresses spine. Focus on: Erector spinae, latissimus dorsi, trapezius, psoas. (3) <strong>Graston technique</strong>: Instrument-assisted soft tissue mobilization. Breaks up fascial adhesions that restrict movement and compress spine. (4) <strong>Spinal decompression table</strong>: Motorized traction table that gently pulls spine apart. 20-30 minute sessions. Results: Can add 1-3cm by: correcting posture, properly spacing vertebrae, releasing chronic muscle tension. Get X-rays before/after (3-6 months) to document changes. Cost: $50-150 per session. Benefits beyond height: reduced pain, better posture, improved mobility. Best combined with home hanging/stretching."
+                    }
+                ]
+            });
+
+            // Add growth plate preservation for young individuals
+            if (age <= 18) {
+                plan.advanced.push({
+                    title: "Growth Plate Preservation (Under 18 Only)",
+                    icon: "🔬",
+                    content: "Strategies to keep growth plates open as long as possible. Growth plates typically fuse between ages 14-18 (girls earlier). Delaying fusion by 1-2 years can add 3-7cm. ONLY applicable before fusion occurs.",
+                    steps: [
+                        {
+                            name: "Aromatase Inhibitor Protocol (Medical)",
+                            details: "⚠️ <strong>REQUIRES ENDOCRINOLOGIST SUPERVISION</strong>. Aromatase enzyme converts testosterone → estrogen. Estrogen causes growth plate fusion. By reducing estrogen, you delay fusion 1-2 years. <strong>Medications</strong>: (1) <strong>Letrozole</strong> (Femara): 2.5mg every 48 hours (every other day). Most potent AI. (2) <strong>Anastrozole</strong> (Arimidex): 0.5-1mg daily. Less potent, more predictable. <strong>Protocol</strong>: Start low, adjust based on blood work. Monitor: (1) Estrogen (E2) levels MONTHLY - keep at 15-25 pg/mL (NOT lower), (2) Bone density (DEXA scan) every 6 months - ensure not losing density, (3) Growth plate X-rays every 3 months - track fusion progress. <strong>Duration</strong>: Typically 12-24 months maximum. <strong>Results</strong>: Can add 3-7cm by extending growth window. <strong>Best for</strong>: Early bloomers (puberty < 12 years) who would otherwise fuse plates early. <strong>Risks</strong>: (1) Too low estrogen causes: bone pain, joint stiffness, reduced bone density, (2) Possible effects on: lipid profile, liver function, (3) Unknown long-term effects on: fertility (theoretical). <strong>Cost</strong>: $50-200/month + monitoring costs. <strong>Availability</strong>: Prescription only. Doctor must justify medical necessity."
+                        },
+                        {
+                            name: "Tamoxifen Alternative (Medical)",
+                            details: "⚠️ <strong>REQUIRES ENDOCRINOLOGIST SUPERVISION</strong>. Tamoxifen: Selective Estrogen Receptor Modulator (SERM). Instead of reducing estrogen production (AI approach), blocks estrogen RECEPTORS in growth plates specifically. <strong>Protocol</strong>: 10-20mg daily. <strong>Advantages over AIs</strong>: (1) Doesn't crash estrogen systemically (safer bone health), (2) Better cardiovascular profile, (3) Fewer side effects. <strong>Monitoring</strong>: (1) Liver function tests every 3 months, (2) Eye exams every 6 months (rare: retinal changes), (3) Growth plate X-rays every 3 months. <strong>Results</strong>: Studies show extends growth period by 12-18 months, potentially adding 3-5cm. <strong>Duration</strong>: 12-24 months typical. <strong>Best for</strong>: Early-mid puberty (Tanner stage 2-3). <strong>Side effects</strong>: Generally well-tolerated. Rare: hot flashes, mood changes. <strong>Research</strong>: More safety data than AIs for pediatric use."
+                        },
+                        {
+                            name: "Eliminate Phytoestrogens",
+                            details: "Plant compounds that mimic estrogen can accelerate growth plate fusion. <strong>Foods to COMPLETELY AVOID</strong>: (1) <strong>Soy products</strong>: Tofu, soy milk, edamame, soy protein isolate (highest phytoestrogens - isoflavones), (2) <strong>Flax seeds</strong>: Highest lignan content (estrogenic), (3) <strong>Sesame seeds</strong>: High lignan content, (4) <strong>Beer/hops</strong>: Contains 8-prenylnaringenin (potent phytoestrogen). <strong>Foods to MINIMIZE</strong>: (1) <strong>Dairy</strong>: Contains bovine estrogen (natural but still estrogenic), (2) <strong>Licorice</strong>: Contains glycyrrhizin (estrogenic effects), (3) <strong>Alfalfa sprouts</strong>: Moderate phytoestrogens. <strong>Safe alternatives</strong>: Soy milk → Almond/Oat milk, Tofu → Chicken/Fish/Beans, Flax seeds → Chia seeds (lower lignan). <strong>Why it matters</strong>: Even PLANT estrogens can trigger estrogen receptors in growth plates, accelerating fusion. Small exposures add up over months/years. More critical if already taking AIs (don't sabotage with diet)."
+                        },
+                        {
+                            name: "Endocrine Disruptor Elimination",
+                            details: "Remove environmental xenoestrogens (synthetic estrogen-mimicking chemicals). <strong>Plastics</strong>: (1) NEVER use plastic containers for food/drink (BPA, BPS, phthalates leach), (2) Glass only for storage, (3) Stainless steel water bottle, (4) Avoid plastic wrap (use beeswax wraps or glass). <strong>Water</strong>: (1) Use reverse osmosis filter (removes synthetic estrogens from birth control pills that enter water supply), (2) Or activated carbon filter (reduces but doesn't eliminate). <strong>Receipts</strong>: (1) Thermal receipts coated with BPA (absorbs through skin), (2) Decline receipt or wash hands immediately after, (3) NEVER handle receipt then eat. <strong>Personal care</strong>: (1) Use paraben-free deodorant, shampoo, lotion, (2) Avoid fragrances (contain phthalates), (3) Natural/organic products. <strong>Food</strong>: (1) Organic when possible (pesticides are estrogenic), (2) Avoid canned foods (BPA in can linings), (3) Fresh/frozen over canned. <strong>Why it matters</strong>: Cumulative exposure to xenoestrogens adds up. Each source alone might be small, but total burden can be significant. Critical period: trying to delay growth plate fusion - every bit of estrogen exposure matters."
+                        }
+                    ]
+                });
+
+                plan.advanced.push({
+                    title: "Experimental & Research Protocols",
+                    icon: "🧪",
+                    content: "Cutting-edge, experimental methods from recent research. Limited data, mostly anecdotal reports. Use at your own risk after thorough research. These are NOT mainstream but show promise in small studies or anecdotal reports.",
+                    steps: [
+                        {
+                            name: "Intermittent Hypoxia Training",
+                            details: "Training in low-oxygen environment forces adaptive responses. <strong>Mechanisms</strong>: (1) Hypoxia triggers HGH production (survival response), (2) Increases red blood cell production (EPO), (3) May stimulate growth factors (VEGF, IGF-1), (4) Enhances mitochondrial function. <strong>Methods</strong>: (1) <strong>Elevation training mask</strong>: Restricts airflow during exercise (simulates altitude). Wear during HIIT workouts (20 min, 3x/week). (2) <strong>Altitude sleeping</strong>: Sleep in altitude generator tent (simulates 8,000-12,000 ft elevation). (3) <strong>Breath-holding exercises</strong>: Perform during exercise (swim underwater, hold breath during reps). <strong>Protocol</strong>: Start gradual - 10 minutes daily with mask, increase to 20 minutes. Or sleep at 'altitude' nightly (8 hours). <strong>Research</strong>: Elite athletes use for performance. Theory: hypoxia triggers HGH release similar to deep sleep. Preliminary data promising but limited studies on height. <strong>Cost</strong>: Training mask $30-100, altitude generator $3,000-5,000. <strong>Safety</strong>: Generally safe for healthy individuals. Avoid if: asthma, cardiovascular issues. Monitor symptoms (dizziness, excessive fatigue)."
+                        },
+                        {
+                            name: "Vitamin K2 MK-4 Megadosing",
+                            details: "Japanese research: High-dose MK-4 form increases bone formation dramatically. <strong>Standard dose</strong>: 200mcg MK-7. <strong>Megadose protocol</strong>: 45mg (45,000mcg) MK-4 daily - that's 225x higher. <strong>Mechanism</strong>: MK-4 directly activates osteoblasts (bone-building cells) independent of Vitamin D. Increases osteocalcin (bone protein) by 50%. <strong>Dosage</strong>: 15mg with breakfast, 15mg with lunch, 15mg with dinner (total 45mg). <strong>Form</strong>: Must be MK-4, NOT MK-7 (different pharmacology). <strong>Research</strong>: Japanese osteoporosis treatment uses 45mg MK-4. Studies show: increases bone density, reduces fractures, increases bone formation markers. <strong>Theory for height</strong>: By maximizing bone formation rate, may add 1-2cm by optimizing bone growth during development. <strong>Cost</strong>: Expensive - pharmaceutical MK-4 $100-200/month. <strong>Safety</strong>: Very safe even at high doses. Fat-soluble but toxicity rare. <strong>Must take with</strong>: Vitamin D3 (5000+ IU) and fats (absorption). <strong>Duration</strong>: 6-12 months minimum to see bone changes."
+                        },
+                        {
+                            name: "Strontium Ranelate",
+                            details: "Strontium: element chemically similar to calcium, incorporates into bone crystal structure. <strong>Medication</strong>: Strontium Ranelate (Protelos/Osseor) - prescription in Europe for osteoporosis. <strong>Mechanism</strong>: (1) Increases bone formation (stimulates osteoblasts), (2) Decreases bone resorption (inhibits osteoclasts), (3) Improves bone density and potentially growth. <strong>Dosage</strong>: 2000mg before bed on empty stomach (3+ hours after eating, 2+ hours before eating). <strong>Important</strong>: Do NOT take with calcium (competes for absorption). <strong>Research</strong>: Proven for bone density. Theory: may improve bone growth during development by optimizing formation/resorption balance. <strong>Controversy</strong>: Banned in some countries (cardiovascular concerns in elderly). Data shows risk mainly in elderly with existing heart conditions. <strong>Monitoring</strong>: (1) Kidney function every 3 months, (2) Calcium levels, (3) Cardiovascular health. <strong>Duration</strong>: 6-12 months. <strong>Availability</strong>: Prescription only. Harder to obtain in US (not FDA approved). <strong>Alternative</strong>: Strontium citrate (supplement form, weaker but OTC available)."
+                        },
+                        {
+                            name: "HMB (Beta-Hydroxy Beta-Methylbutyrate)",
+                            details: "HMB: metabolite of leucine (amino acid) with potent anabolic effects. <strong>Mechanisms</strong>: (1) Increases protein synthesis (mTOR activation), (2) Reduces muscle/protein breakdown (anti-catabolic), (3) May stimulate IGF-1 production, (4) Enhances recovery. <strong>Dosage</strong>: 3g daily split into 1g with each meal (breakfast, lunch, dinner). <strong>Research</strong>: Extensively studied for muscle growth. Shows: muscle gain, strength increase, reduced muscle damage. Limited but promising data on bone: may increase bone formation markers. <strong>Theory for height</strong>: IGF-1 stimulation + anabolic environment = enhanced growth factor production. Some research suggests enhances growth in youth. <strong>Forms</strong>: HMB-Ca (calcium salt) or HMB-FA (free acid - faster absorption). <strong>Safety</strong>: Very safe. One of most studied supplements. Safe for teenagers. <strong>Cost</strong>: $30-50/month. <strong>Synergy</strong>: Works well with: creatine, protein, leucine. Best combined with resistance training + adequate protein (2g/kg)."
+                        },
+                        {
+                            name: "Glucosamine Sulfate Megadosing",
+                            details: "Glucosamine: substrate for cartilage synthesis in growth plates. <strong>Standard dose</strong>: 1500mg. <strong>Megadose protocol</strong>: 3000-4500mg daily. <strong>Mechanism</strong>: Oversupplying substrate (glucosamine) allows MORE growth plate cartilage production = potentially more growth. <strong>Dosage</strong>: 1500mg with breakfast, 1500mg with lunch, 1500mg with dinner (total 4500mg). <strong>Form</strong>: MUST be glucosamine SULFATE (not HCl - sulfate form provides sulfur for cartilage). <strong>Combination</strong>: Take WITH chondroitin (1200mg) and MSM (1000mg) for synergy. <strong>Theory</strong>: By removing substrate limitation, growth plates can produce more cartilage, potentially extending growth. <strong>Anecdotal reports</strong>: Some report increased growth velocity (0.5-1cm/year beyond expected). <strong>Research</strong>: Proven safe at high doses (up to 3000mg studied). No toxicity. <strong>Best for</strong>: Younger individuals (under 18) with open growth plates. <strong>Cost</strong>: $40-60/month at high doses. <strong>Duration</strong>: 6-12 months minimum. <strong>Safety</strong>: Very safe even at high doses. Mild GI discomfort possible (take with food)."
+                        }
+                    ]
+                });
+            }
+
+            // ==========================================
+            // SECTION 7: TIMELINE
+            // ==========================================
+            
+            const monthlyPlan = [
+                {
+                    month: "Month 1",
+                    title: "Foundation Phase",
+                    description: "Start with basics: establish sleep schedule (10 PM - 7 AM), begin daily hanging (2x daily), take core supplements (Vitamin D3 5000 IU, Calcium 1500mg, Magnesium 400mg, Zinc 30mg). Get baseline measurements: height (morning, against wall), weight, body composition. Start food diary to track protein intake (aim 2g/kg). Begin stretching routine (morning cobra, cat-cow, evening hanging). This month is about building habits - consistency matters more than intensity."
+                },
+                {
+                    month: "Month 2",
+                    title: "Nutritional Optimization",
+                    description: "Add full supplement stack: L-Arginine (6g before bed), Ashwagandha KSM-66 (600mg 2x daily), Collagen Peptides (15g morning). Perfect your meal timing and protein distribution across 4-5 meals. Start tracking sleep quality using app or journal (note wake-ups, dreams, morning energy). Increase exercise intensity: add HIIT 3x weekly, swimming or basketball 3-4x weekly. First progress check: measure height, compare to baseline, photograph posture from side."
+                },
+                {
+                    month: "Month 3",
+                    title: "Advanced Supplementation",
+                    description: "Introduce advanced supplements: GABA (3g pre-workout or bedtime), L-Ornithine (2-3g with Arginine), Glucosamine+Chondroitin+MSM stack. Refine sleep optimization: ensure pitch-black room (tape all LEDs), temperature 60-67°F, consider melatonin 1-3mg nightly. Add spinal decompression: 3 sets hanging to failure morning/evening, cobra stretch 3x daily. Consider inversion table if budget allows (start 5 min at 60°, build to 15 min at 90°). Progress measurement week."
+                },
+                {
+                    month: "Month 4",
+                    title: "Hormonal Enhancement",
+                    description: "Implement intermittent fasting 16:8 (if not already). Optimize HGH production: HIIT 3x weekly in fasted state, pre-bed supplement stack (Arginine + Ornithine + GABA + Melatonin + Magnesium + Glycine). Add plyometric training 3x weekly (box jumps, depth jumps). If under 18 and early bloomer, consider discussing Aromatase Inhibitors with endocrinologist. Track morning energy levels and recovery (indicators of HGH production). Comprehensive blood work: check IGF-1, Vitamin D, hormones."
+                },
+                {
+                    month: "Month 5",
+                    title: "Exercise Intensification",
+                    description: "Increase exercise volume: swimming/basketball 5x weekly (60+ min sessions), daily hanging (3-5 sets 2x daily), add ankle weight walking (start 1kg, 20 min daily). Focus on explosive movements (jumping as high as possible 50-100x per session). Add yoga flow daily: downward dog, cobra, cat-cow sequence (15 minutes). Consider hiring PT for posture correction and spine alignment exercises. This is the intensity peak month."
+                },
+                {
+                    month: "Month 6",
+                    title: "Mid-Program Assessment",
+                    description: "Comprehensive 6-month evaluation: measure height (multiple times, morning), take photos (posture comparison), reassess sleep quality, review blood work (IGF-1, Vitamin D, zinc, magnesium), check supplement compliance. Calculate growth rate: total cm gained / 6 months = monthly rate. Adjust protocol based on results: if growing well, maintain; if plateaued, increase intensity or add advanced techniques. Consider professional spinal decompression (chiropractor 2x weekly for 4 weeks). Reassess goals and motivation."
+                },
+                {
+                    month: "Month 7",
+                    title: "Sustained Momentum",
+                    description: "Continue optimized protocol from months 4-6. Focus on consistency - no skipped days. Ensure sleep quality remains optimal (track with device if possible). Maintain supplement stack without gaps. Consider rotating exercises to prevent adaptation: switch from basketball to volleyball, add different stretching sequences. Add meditation/stress management (cortisol control). Review and optimize meal timing around workouts. This is the grind phase - results come from consistency."
+                },
+                {
+                    month: "Month 8",
+                    title: "Advanced Techniques Integration",
+                    description: "Introduce experimental protocols (if desired): MK-677 12.5-25mg (research carefully first), hyperloading protocol with weighted vest (start 10kg all day), high-dose K2 MK-4 (45mg daily in 3 doses), or other advanced supplements. Increase hanging time goals (work toward 2+ minute single hang). Add resistance band leg stretching daily (10 min per leg). Professional massage therapy 2x monthly (deep tissue, focus on back). This month pushes boundaries."
+                },
+                {
+                    month: "Month 9",
+                    title: "Optimization & Fine-Tuning",
+                    description: "Review entire protocol and optimize weak points: if sleep inconsistent, add stricter routine; if protein intake varies, meal prep in advance; if supplements occasionally missed, set phone reminders. Double-down on what's working best for YOU (everyone responds differently). Get growth plate X-ray if under 18 (check fusion status). Blood work: check all markers again, adjust supplementation if deficiencies found. Consider peptide research if plates confirmed open and budget allows (CJC-1295 + Ipamorelin)."
+                },
+                {
+                    month: "Month 10",
+                    title: "Peak Performance Phase",
+                    description: "This is your highest compliance month - perfect execution across all areas. Sleep 9-10 hours nightly (no exceptions), protein 2-2.5g/kg every day, all supplements on schedule, exercise 6x weekly minimum. Maximize HGH stimulation: fasted HIIT 3x weekly, pre-bed stack every night, intermittent fasting 16:8 daily. Add professional support: PT for posture optimization, chiropractor for spinal alignment, massage therapist for muscle release. Push hanging time personal records. Track everything meticulously."
+                },
+                {
+                    month: "Month 11",
+                    title: "Consolidation Phase",
+                    description: "Focus on solidifying gains and ensuring bone mineralization. Ensure calcium (1500-2000mg) and Vitamin D3 (5000-10000 IU) intake optimal - this is when new bone growth MINERALIZES (hardens). Continue full protocol but consider slight reduction in exercise intensity (allow bone consolidation). Maintain hanging and stretching (preserve spinal gains). Continue sleep optimization (HGH still crucial). Add bone-building foods: sardines with bones, Greek yogurt, cheese, tahini, dark leafy greens. Measure posture improvements (compare photos month 1 vs 11)."
+                },
+                {
+                    month: "Month 12",
+                    title: "Final Assessment & Future Planning",
+                    description: "Comprehensive final evaluation: Measure height multiple times (morning, evening, average), compare to month 1 baseline, calculate total gain. Take final photos (posture, full body). Review all journals and data (what correlated with best growth periods?). Blood work: final IGF-1, Vitamin D, minerals check. Growth plate X-ray if under 18 (compare to month 9, assess fusion progress). Create maintenance plan: which habits to continue indefinitely (sleep, supplements, hanging), which to cycle or reduce. Plan next 6-12 months: continue protocol if still growing, maintain gains if plates closed. Celebrate progress regardless of cm gained - you optimized YOUR genetic potential."
+                }
+            ];
+
+            plan.timeline = monthlyPlan.map((item, index) => ({
+                month: item.month,
+                title: item.title,
+                description: item.description
+            }));
+
+            // ==========================================
+            // SECTION 8: PROGRESS TRACKING
+            // ==========================================
+            
+            plan.tracking = [
+                {
+                    name: "Height Measurements",
+                    percentage: 0,
+                    description: "Measure every 2 weeks in morning against wall (no shoes). Record 3 measurements, use average. Track in spreadsheet: date, time, height, notes. Morning height is 1-2cm taller than evening (spinal compression during day). Use this to track decompression improvements."
+                },
+                {
+                    name: "Sleep Quality Score",
+                    percentage: 0,
+                    description: "Rate 1-10 daily. Track: hours slept, times woken, morning energy, dreams remembered. Use sleep tracking app or journal. Target: 9-10 hours, <1 wake-up, 8+ energy score. Poor sleep = low HGH = no growth. Most important metric."
+                },
+                {
+                    name: "Supplement Compliance",
+                    percentage: 0,
+                    description: "Track % of supplements taken on schedule. Use pill organizer or tracking app. Target: 95%+ compliance. Missing doses = suboptimal results. Create routine: morning stack, pre-workout, evening stack, bedtime stack. Set phone reminders."
+                },
+                {
+                    name: "Protein Intake (g/day)",
+                    percentage: 0,
+                    description: "Track daily in app (MyFitnessPal, Cronometer). Target: 2.0-2.5g per kg bodyweight. Example: 70kg person = 140-175g protein. Spread across 4-5 meals. Count everything: meat, eggs, dairy, protein powder, legumes. Insufficient protein = stunted growth."
+                },
+                {
+                    name: "Exercise Consistency",
+                    percentage: 0,
+                    description: "Track weekly exercise completion: HIIT (3x), swimming/basketball (4-5x), hanging (14x = 2 per day), stretching (daily). Target: 90%+ completion rate. Log each session. Missing workouts = missing growth stimulus. Consistency > intensity."
+                },
+                {
+                    name: "Posture Improvement",
+                    percentage: 0,
+                    description: "Monthly photo comparison (side view against wall). Check: forward head position, shoulder rounding, spinal curve. Measure wall-to-head distance (should decrease = better posture). Good posture can add 2-3cm VISUAL height + improve actual height through spinal alignment. Track via photos and measurements."
+                }
+            ];
+
+            return plan;
+        }
+
+        // ==========================================
+        // DATA LOADING AND DISPLAY
+        // ==========================================
+
+        function loadData() {
+            console.log('Loading data from localStorage...');
+            
+            // Retrieve data from localStorage
+            const storedUserData = localStorage.getItem('heightUserData');
+            const storedPrediction = localStorage.getItem('heightPrediction');
+            
+            console.log('Stored user data:', storedUserData);
+            console.log('Stored prediction:', storedPrediction);
+
+            if (!storedUserData || !storedPrediction) {
+                console.log('Data not found, showing error screen');
+                showError();
+                return false;
+            }
+
+            try {
+                userData = JSON.parse(storedUserData);
+                predictionResult = JSON.parse(storedPrediction);
+                
+                console.log('Parsed user data:', userData);
+                console.log('Parsed prediction:', predictionResult);
+
+                // Generate comprehensive growth plan
+                growthPlan = generateComprehensiveGrowthPlan(userData, predictionResult);
+                console.log('Generated growth plan:', growthPlan);
+
+                return true;
+            } catch (error) {
+                console.error('Error parsing data:', error);
+                showError();
+                return false;
+            }
+        }
+
+        function displayData() {
+            console.log('Displaying data...');
+
+            // Update hero section
+            const age = parseInt(userData.currentAge);
+            const currentHeight = parseInt(userData.currentHeight);
+            const predictedHeight = predictionResult.predictedHeight;
+            const potentialGrowth = predictedHeight - currentHeight;
+            
+            document.getElementById('potentialGrowth').textContent = potentialGrowth.toFixed(1) + ' cm';
+            document.getElementById('confidenceLevel').textContent = predictionResult.confidence + '%';
+            document.getElementById('currentHeight').textContent = currentHeight + ' cm';
+            
+            // Update data summary
+            document.getElementById('ageDisplay').textContent = age + ' years';
+            document.getElementById('pubertyDisplay').textContent = userData.pubertyAge + ' years';
+            document.getElementById('bodyTypeDisplay').textContent = userData.bodyType.charAt(0).toUpperCase() + userData.bodyType.slice(1);
+            document.getElementById('sleepDisplay').textContent = userData.sleep + ' hours';
+
+            // Update scenario information
+            const scenario = predictionResult.scenario;
+            document.getElementById('scenarioIcon').textContent = scenario.icon;
+            document.getElementById('scenarioName').textContent = scenario.name;
+            document.getElementById('scenarioType').textContent = scenario.type;
+            document.getElementById('scenarioDescription').textContent = scenario.description;
+
+            // Add scenario tags
+            const tagsContainer = document.getElementById('planTags');
+            tagsContainer.innerHTML = '';
+            
+            const tags = [
+                `Age: ${age}`,
+                `Current: ${currentHeight}cm`,
+                `Target: ${predictedHeight}cm`,
+                `Growth: +${potentialGrowth.toFixed(1)}cm`,
+                scenario.category
+            ];
+
+            tags.forEach(tag => {
+                const tagEl = document.createElement('div');
+                tagEl.className = 'plan-tag';
+                tagEl.textContent = tag;
+                tagsContainer.appendChild(tagEl);
+            });
+
+            // Display all sections
+            displayHormonalOptimization();
+            displayNutritionalProtocols();
+            displaySupplementation();
+            displayExerciseProtocols();
+            displaySleepOptimization();
+            displayAdvancedTechniques();
+            displayTimeline();
+            displayProgressTracking();
+        }
+
+        function displayHormonalOptimization() {
+            const container = document.getElementById('hormonalOptimization');
+            container.innerHTML = '';
+
+            growthPlan.hormonal.forEach(category => {
+                const card = createCategoryCard(category);
+                container.appendChild(card);
+            });
+        }
+
+        function displayNutritionalProtocols() {
+            const container = document.getElementById('nutritionalProtocols');
+            container.innerHTML = '';
+
+            growthPlan.nutritional.forEach(category => {
+                const card = createCategoryCard(category);
+                container.appendChild(card);
+            });
+        }
+
+        function displaySupplementation() {
+            const container = document.getElementById('supplementation');
+            container.innerHTML = '';
+
+            growthPlan.supplementation.forEach(category => {
+                const card = createCategoryCard(category);
+                container.appendChild(card);
+            });
+        }
+
+        function displayExerciseProtocols() {
+            const container = document.getElementById('exerciseProtocols');
+            container.innerHTML = '';
+
+            growthPlan.exercise.forEach(category => {
+                const card = createCategoryCard(category);
+                container.appendChild(card);
+            });
+        }
+
+        function displaySleepOptimization() {
+            const container = document.getElementById('sleepOptimization');
+            container.innerHTML = '';
+
+            growthPlan.sleep.forEach(category => {
+                const card = createCategoryCard(category);
+                container.appendChild(card);
+            });
+        }
+
+        function createCategoryCard(category) {
+            const card = document.createElement('div');
+            card.className = 'category-card reveal';
+            
+            card.innerHTML = `
+                <div class="category-header">
+                    <div class="category-icon">${category.icon}</div>
+                    <h3 class="category-title">${category.category}</h3>
+                </div>
+                <p class="category-description">${category.description}</p>
+                <ul class="item-list">
+                    ${category.items.map(item => `
+                        <li class="item">
+                            <div class="item-header">
+                                <span class="item-name">${item.name}</span>
+                                <span class="item-badge">${item.badge}</span>
+                            </div>
+                            <div class="item-dosage">${item.dosage}</div>
+                            <div class="item-details">${item.details}</div>
+                            ${item.warning ? `<div class="item-warning">⚠️ ${item.warning}</div>` : ''}
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+
+            return card;
+        }
+
+        function displayAdvancedTechniques() {
+            const container = document.getElementById('advancedTechniques');
+            container.innerHTML = '';
+
+            growthPlan.advanced.forEach((technique, index) => {
+                const accordion = document.createElement('div');
+                accordion.className = 'accordion-item';
+                accordion.innerHTML = `
+                    <div class="accordion-header">
+                        <div class="accordion-title">
+                            <span class="accordion-icon">${technique.icon}</span>
+                            ${technique.title}
+                        </div>
+                        <span class="accordion-toggle">▼</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-body">
+                            <p style="margin-bottom: 20px; font-weight: bold;">${technique.content}</p>
+                            ${technique.steps.map(step => `
+                                <div class="protocol-card">
+                                    <div class="protocol-header">
+                                        <div class="protocol-number">${technique.steps.indexOf(step) + 1}</div>
+                                        <h4 class="protocol-title">${step.name || 'Step ' + (technique.steps.indexOf(step) + 1)}</h4>
+                                    </div>
+                                    <div class="protocol-content">${step.details || step}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+
+                // Add click event for accordion
+                const header = accordion.querySelector('.accordion-header');
+                header.addEventListener('click', () => {
+                    accordion.classList.toggle('active');
+                });
+
+                container.appendChild(accordion);
+            });
+        }
+
+        function displayTimeline() {
+            const container = document.getElementById('implementationTimeline');
+            container.innerHTML = '';
+
+            growthPlan.timeline.forEach((item, index) => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item reveal';
+                timelineItem.innerHTML = `
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-month">${item.month}: ${item.title}</div>
+                        <div class="timeline-description">${item.description}</div>
+                    </div>
+                `;
+                container.appendChild(timelineItem);
+            });
+        }
+
+        function displayProgressTracking() {
+            const container = document.getElementById('progressTracking');
+            container.innerHTML = '';
+
+            growthPlan.tracking.forEach(metric => {
+                const progressItem = document.createElement('div');
+                progressItem.className = 'progress-item';
+                progressItem.innerHTML = `
+                    <div class="progress-header">
+                        <span class="progress-name">${metric.name}</span>
+                        <span class="progress-percentage">${metric.percentage}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${metric.percentage}%"></div>
+                    </div>
+                    <p style="margin-top: 10px; color: var(--text-secondary); font-size: 1rem;">${metric.description}</p>
+                `;
+                container.appendChild(progressItem);
+
+                // Animate progress bar
+                setTimeout(() => {
+                    const fill = progressItem.querySelector('.progress-fill');
+                    fill.style.width = metric.percentage + '%';
+                }, 100);
+            });
+        }
+
+        function showError() {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('errorScreen').classList.add('active');
+        }
+
+        // Scroll reveal animation
+        function revealOnScroll() {
+            const reveals = document.querySelectorAll('.reveal');
+            
+            reveals.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('active');
+                }
+            });
+        }
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+
+        window.addEventListener('load', () => {
+            console.log('Page loaded, initializing...');
+            
+            createParticles();
+            
+            // Simulate loading time
+            setTimeout(() => {
+                const dataLoaded = loadData();
+                
+                if (dataLoaded) {
+                    displayData();
+                    
+                    // Hide loading, show main content
+                    document.getElementById('loadingScreen').classList.add('hidden');
+                    document.getElementById('mainContainer').classList.add('active');
+                    
+                    // Initial reveal check
+                    setTimeout(() => {
+                        revealOnScroll();
+                    }, 100);
+                } else {
+                    showError();
+                }
+            }, 2000);
+        });
+
+        // Scroll event listener for reveal animations
+        window.addEventListener('scroll', revealOnScroll);
+
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
